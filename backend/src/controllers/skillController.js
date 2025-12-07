@@ -13,7 +13,7 @@ const getSkills = async (req, res, next) => {
         }
 
         // Build response with skill info
-        const skills = ['skill1', 'skill2', 'skill3', 'skill4'].map(skillId => {
+        const skills = ['skill1', 'skill2', 'skill3', 'skill4', 'skill5', 'skill6'].map(skillId => {
             const skillData = classSkills[skillId];
             const userSkill = user.skills[skillId];
             const currentLevel = userSkill.level;
@@ -48,7 +48,7 @@ const upgradeSkill = async (req, res, next) => {
         const { skillId } = req.body;
         const user = await User.findById(req.user._id);
 
-        if (!['skill1', 'skill2', 'skill3', 'skill4'].includes(skillId)) {
+        if (!['skill1', 'skill2', 'skill3', 'skill4', 'skill5', 'skill6'].includes(skillId)) {
             return res.status(400).json({ message: 'Invalid skill ID' });
         }
 

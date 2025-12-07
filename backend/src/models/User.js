@@ -53,6 +53,12 @@ const UserSchema = new mongoose.Schema({
     },
     skill4: {
       level: { type: Number, default: 0, min: 0, max: 5 }
+    },
+    skill5: {
+      level: { type: Number, default: 0, min: 0, max: 5 }
+    },
+    skill6: {
+      level: { type: Number, default: 0, min: 0, max: 5 }
     }
   },
   weeklyTasksCompleted: { type: Number, default: 0 },
@@ -67,40 +73,50 @@ const UserSchema = new mongoose.Schema({
   },
 
   inventory: { type: [InventoryItemSchema], default: [] },
-  completedQuests: { type: [String], default: [] },
+  inventory: { type: [InventoryItemSchema], default: [] },
+  completedQuests: { type: [String], default: [] }, // Retain for legacy/simple checks
+  taskHistory: [{
+    taskId: { type: String, required: true },
+    completedAt: { type: Date, default: Date.now }
+  }],
+  focusAreas: { type: [String], default: [] }, // User selected goals: 'fitness', 'mental', 'social', 'productivity'
   lastRestTime: { type: Date, default: null }
 }, { timestamps: true });
 
 // Method to calculate max HP based on vitality + equipment
+// BALANCE: Stats scale at DOUBLE rate
 UserSchema.methods.calculateMaxHP = function () {
   const totalVitality = this.stats.vitality + (this.equipmentBonuses?.vitality || 0);
-  return 100 + (totalVitality * 10);
+  return 100 + (totalVitality * 20); // Was *10, now *20 (double)
 };
 
 // Method to calculate max Mana based on intelligence + equipment
+// BALANCE: Stats scale at DOUBLE rate
 UserSchema.methods.calculateMaxMana = function () {
   const totalIntelligence = this.stats.intelligence + (this.equipmentBonuses?.intelligence || 0);
-  // Base 50 + 5 per INT point
-  return 50 + (totalIntelligence * 5);
+  return 50 + (totalIntelligence * 10); // Was *5, now *10 (double)
 };
 
 // Method to calculate physical damage
+// BALANCE: Stats scale at DOUBLE rate
 UserSchema.methods.calculatePhysicalDamage = function (baseWeaponDamage = 10) {
   const totalStrength = this.stats.strength + (this.equipmentBonuses?.strength || 0);
-  return Math.floor(baseWeaponDamage * (1 + (totalStrength / 20)));
+  return Math.floor(baseWeaponDamage * (1 + (totalStrength / 10))); // Was /20, now /10 (double effect)
 };
 
 // Method to calculate magical damage
+// BALANCE: Stats scale at DOUBLE rate
 UserSchema.methods.calculateMagicalDamage = function (baseSpellDamage = 10) {
   const totalIntelligence = this.stats.intelligence + (this.equipmentBonuses?.intelligence || 0);
-  return Math.floor(baseSpellDamage * (1 + (totalIntelligence / 20)));
+  return Math.floor(baseSpellDamage * (1 + (totalIntelligence / 10))); // Was /20, now /10 (double effect)
 };
 
 // Method to calculate critical chance
+// BALANCE: Stats scale at DOUBLE rate
 UserSchema.methods.calculateCritChance = function () {
   const totalDexterity = this.stats.dexterity + (this.equipmentBonuses?.dexterity || 0);
   const totalLuck = this.stats.luck + (this.equipmentBonuses?.luck || 0);
-  return 5 + (totalDexterity / 10) + (totalLuck / 20);
+  return 5 + (totalDexterity / 5) + (totalLuck / 10); // Was /10 and /20, now /5 and /10 (double effect)
 };
 
 module.exports = mongoose.model('User', UserSchema);

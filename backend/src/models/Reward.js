@@ -22,6 +22,10 @@ const RewardSchema = new mongoose.Schema({
   // Item Effects
   effects: {
     healHP: { type: Number, default: 0 },           // Instant HP restoration
+    healMana: { type: Number, default: 0 },         // Instant Mana restoration
+    healPercent: { type: Number, default: 0 },      // Heal percentage of max HP (for Full Restore)
+    manaPercent: { type: Number, default: 0 },      // Restore percentage of max Mana
+    curePoison: { type: Boolean, default: false },  // Cure poison status
     buffStrength: { type: Number, default: 0 },     // Temporary STR boost
     buffIntelligence: { type: Number, default: 0 }, // Temporary INT boost
     buffVitality: { type: Number, default: 0 },     // Permanent VIT boost

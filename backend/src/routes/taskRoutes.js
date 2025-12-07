@@ -3,7 +3,7 @@ const { listTasks, createTask, completeTask } = require('../controllers/taskCont
 const auth = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.get('/', listTasks);
+router.get('/', auth, listTasks);
 router.post('/', auth, createTask); // admin use maybe later
 router.post('/complete', auth, completeTask);
 

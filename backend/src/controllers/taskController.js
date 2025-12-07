@@ -3,9 +3,40 @@ const User = require('../models/User');
 
 const listTasks = async (req, res, next) => {
   try {
-    const tasks = await Task.find({});
-    // Map tasks to flatten title for frontend if needed, or frontend handles it
-    // For now, let's return as is, but frontend needs to handle title.en/es
+    // We need the user to check their focus areas
+    // req.user is set by authMiddleware, but might be just { _id: ... } depending on implementation
+    // Let's fetch full user to be safe
+    const user = await User.findById(req.user._id);
+
+    let query = {};
+
+    // If user has defined focus areas, filter system tasks
+    if (user && user.focusAreas && user.focusAreas.length > 0) {
+      query = {
+        $or: [
+          { type: 'user', _id: { $in: user.taskHistory.map(h => h.taskId) } }, // Or however user-custom tasks work
+          { type: 'system', category: { $in: user.focusAreas } },
+          { type: 'system', category: 'General' } // Always include General if exists
+        ]
+      };
+      // Fallback: If strict filtering returns too few, maybe just return all?
+      // For now, let's allow "Discover" mode in frontend if needed, but here we strictly filter
+      // Actually, let's keep it simple: Return ALL tasks, but let frontend highlight recommended.
+      // But the prompt asked for "Personalized".
+
+      // Let's go with: Return tasks matching categories OR all if array empty.
+      query = {
+        $or: [
+          { category: { $in: user.focusAreas } },
+          { category: { $exists: false } } // Tasks without category
+        ]
+      };
+    }
+
+    // IF we want to return ALL tasks if the user has NO preferences, the query remains {}
+    // IF the user HAS preferences, we filter.
+
+    const tasks = await Task.find(query);
     res.json(tasks);
   } catch (err) { next(err); }
 };
@@ -43,24 +74,69 @@ const completeTask = async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
-    // FIX: Use completedQuests instead of completedTasks
-    if (task.repeatType === 'once' && user.completedQuests.includes(taskId)) {
-      return res.status(400).json({ message: 'Task already completed' });
-    }
+    // --- COOLDOWN & VALIDATION LOGIC ---
+    // Check history for this specific task
+    // We filter history to find completions for this task
+    const completions = user.taskHistory.filter(h => h.taskId === taskId);
 
-    // Add rewards
-    user.xp += task.rewardXP;
-    user.gold += task.rewardGold;
-    user.completedQuests.push(taskId);
+    // Sort by date descending (newest first)
+    completions.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+    const lastCompletion = completions.length > 0 ? completions[0] : null;
 
-    // Weekly task progression for skill points
-    if (task.repeatType === 'weekly') {
+    const now = new Date();
+
+    if (task.repeatType === 'once') {
+      if (lastCompletion || user.completedQuests.includes(taskId)) {
+        return res.status(400).json({ message: 'Task already completed' });
+      }
+    } else if (task.repeatType === 'daily') {
+      if (lastCompletion) {
+        const lastDate = new Date(lastCompletion.completedAt);
+        // Check if last completion was TODAY (same year, month, day)
+        if (lastDate.toDateString() === now.toDateString()) {
+          // Calculate time until reset (midnight tomorrow)
+          const tomorrow = new Date(now);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          tomorrow.setHours(0, 0, 0, 0);
+          const msRemaining = tomorrow - now;
+          const hoursRemaining = Math.ceil(msRemaining / (1000 * 60 * 60));
+
+          return res.status(400).json({
+            message: `Daily task already completed. Resets in ${hoursRemaining}h.`
+          });
+        }
+      }
+    } else if (task.repeatType === 'weekly') {
+      // Implement similar logic for weekly if needed, or keep simple counter
+      // For strict weekly: reset on specific day (e.g., Monday)
+      if (lastCompletion) {
+        const lastDate = new Date(lastCompletion.completedAt);
+        // Get week numbers or just check if > 7 days passed? 
+        // Better: Check if in same ISO week
+        // For MVP simplicity: weekly resets 7 days after completion
+        const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+        if (now - lastDate < oneWeekMs) {
+          return res.status(400).json({ message: 'Weekly task already completed this week.' });
+        }
+      }
+
       user.weeklyTasksCompleted += 1;
       if (user.weeklyTasksCompleted >= 5) {
         user.skillPoints += 1;
         user.weeklyTasksCompleted = 0;
       }
     }
+    // -----------------------------------
+
+    // Add rewards
+    user.xp += task.rewardXP;
+    user.gold += task.rewardGold;
+
+    // Update history tracking
+    if (!user.completedQuests.includes(taskId)) {
+      user.completedQuests.push(taskId);
+    }
+    user.taskHistory.push({ taskId: taskId, completedAt: now });
 
     // Level logic with skill point rewards
     const oldLevel = user.level;

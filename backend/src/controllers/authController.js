@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const register = async (req, res, next) => {
   try {
-    const { username, email, password, class: userClass, avatar } = req.body;
+    const { username, email, password, class: userClass, avatar, focusAreas } = req.body;
 
     if (!username || !password || !userClass) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -24,8 +24,6 @@ const register = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid avatar' });
     }
 
-
-
     const salt = Number(process.env.BCRYPT_SALT || 10);
     const hash = await bcrypt.hash(password, salt);
 
@@ -39,6 +37,7 @@ const register = async (req, res, next) => {
       passwordHash: hash,
       class: userClass,
       avatar: avatar || 'img1', // Default to img1 if not provided
+      focusAreas: focusAreas || [], // Array of selected goals
       stats: initialStats,
       combat: {
         currentHP: initialHP,
@@ -58,6 +57,7 @@ const register = async (req, res, next) => {
         email: user.email,
         class: user.class,
         avatar: user.avatar,
+        focusAreas: user.focusAreas,
         xp: user.xp,
         level: user.level,
         gold: user.gold,
@@ -97,6 +97,7 @@ const login = async (req, res, next) => {
         email: user.email,
         class: user.class,
         avatar: user.avatar,
+        focusAreas: user.focusAreas,
         xp: user.xp,
         level: user.level,
         gold: user.gold,

@@ -9,7 +9,7 @@ const {
     getActiveDungeonSession,
     startDungeon,
     continueDungeon
-} = require('../controllers/combatController');
+} = require('../controllers/combat');
 const protect = require('../middleware/authMiddleware');
 const router = express.Router();
 

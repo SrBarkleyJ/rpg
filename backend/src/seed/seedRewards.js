@@ -21,18 +21,18 @@ const seedRewards = async () => {
                 effects: { healHP: 50, duration: 0 },
                 rarity: 'common',
                 allowedClasses: ['all'],
-                value: 10
+                value: 15
             },
             {
                 name: 'Mana Potion',
-                desc: 'Restores 50 MP (Not implemented yet)',
+                desc: 'Restores 50 MP instantly',
                 type: 'consumable',
                 slot: 'none',
                 image: 'mana_potion',
-                effects: { duration: 0 },
+                effects: { healMana: 50, duration: 0 },
                 rarity: 'common',
                 allowedClasses: ['all'],
-                value: 15
+                value: 20
             },
             {
                 name: 'Greater Health Potion',
@@ -42,6 +42,50 @@ const seedRewards = async () => {
                 image: 'health_potion',
                 effects: { healHP: 100, duration: 0 },
                 rarity: 'uncommon',
+                allowedClasses: ['all'],
+                value: 45
+            },
+            {
+                name: 'Greater Mana Potion',
+                desc: 'Restores 100 MP instantly',
+                type: 'consumable',
+                slot: 'none',
+                image: 'mana_potion',
+                effects: { healMana: 100, duration: 0 },
+                rarity: 'uncommon',
+                allowedClasses: ['all'],
+                value: 50
+            },
+            {
+                name: 'Elixir of Vigor',
+                desc: 'Restores 150 HP instantly',
+                type: 'consumable',
+                slot: 'none',
+                image: 'health_potion',
+                effects: { healHP: 150, duration: 0 },
+                rarity: 'rare',
+                allowedClasses: ['all'],
+                value: 80
+            },
+            {
+                name: 'Full Restore',
+                desc: 'Fully restores HP and MP',
+                type: 'consumable',
+                slot: 'none',
+                image: 'health_potion',
+                effects: { healPercent: 100, manaPercent: 100, duration: 0 },
+                rarity: 'epic',
+                allowedClasses: ['all'],
+                value: 150
+            },
+            {
+                name: 'Antidote',
+                desc: 'Cures poison and restores 25 HP',
+                type: 'consumable',
+                slot: 'none',
+                image: 'health_potion',
+                effects: { healHP: 25, curePoison: true, duration: 0 },
+                rarity: 'common',
                 allowedClasses: ['all'],
                 value: 25
             },
