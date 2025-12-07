@@ -1,0 +1,24 @@
+# Root gitignore for RPG project
+node_modules/
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Artifacts directory (if you want to exclude it from repo)
+# .gemini/

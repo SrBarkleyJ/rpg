@@ -1,0 +1,23 @@
+{
+    "extends": "expo/tsconfig.base",
+    "compilerOptions": {
+        "strict": true,
+        "noImplicitAny": false,
+        "baseUrl": "./src",
+        "paths": {
+            "*": [
+                "*"
+            ]
+        },
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "jsx": "react-native",
+        "useUnknownInCatchVariables": false,
+        "allowJs": true
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.d.ts"
+    ]
+}

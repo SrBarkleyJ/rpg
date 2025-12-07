@@ -1,0 +1,34 @@
+{
+    "expo": {
+        "name": "rpg-frontend",
+        "slug": "rpg-frontend",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "",
+        "userInterfaceStyle": "light",
+        "splash": {
+            "image": "",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "",
+                "backgroundColor": "#ffffff"
+            },
+            "package": "com.rpgfrontend",
+            "permissions": [
+                "INTERNET",
+                "ACCESS_NETWORK_STATE"
+            ],
+            "usesCleartextTraffic": true
+        },
+        "web": {}
+    }
+}
