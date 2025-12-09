@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
         if (error.code === 'ECONNABORTED') {
             console.error('[API] Request timeout - server may not be running');
         } else if (error.message === 'Network Error') {
-            console.error('[API] Network error - check if backend is running on port 4000');
+            console.error(`[API] Network error - could not connect to backend at ${API_URL}`);
         } else {
             console.error('[API] Error:', error.response?.status, error.message);
         }

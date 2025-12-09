@@ -11,13 +11,13 @@ const getBaseURL = (): string => {
 
     // 2. Fallback to Local Development
     if (Platform.OS === 'web') {
-        return 'http://localhost:4000';
+        return 'https://rpg-backend-hq1r.onrender.com';
     } else if (Platform.OS === 'android') {
-        // Use local IP for physical Android device testing (Expo Go)
-        return 'http://192.168.31.223:4000';
+        // Production Backend
+        return 'https://rpg-backend-hq1r.onrender.com';
     } else {
         // iOS/Web fallback
-        return 'http://192.168.31.223:4000';
+        return 'https://rpg-backend-hq1r.onrender.com';
     }
 };
 
