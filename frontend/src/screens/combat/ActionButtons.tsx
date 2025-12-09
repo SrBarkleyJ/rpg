@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import AnimatedPressable from '../../components/UI/AnimatedPressable';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing } from '../../theme/spacing';
 
@@ -36,7 +37,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         <View style={styles.actionsContainer}>
             {!activeCombat || activeCombat.status !== 'active' ? (
                 <>
-                    <TouchableOpacity
+                    <AnimatedPressable
                         style={[styles.actionButton, { backgroundColor: theme.danger, borderColor: theme.border }]}
                         onPress={onInitiateCombat}
                         disabled={loading}
@@ -44,7 +45,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <Text style={[styles.actionText, { color: theme.textLight }]}>
                             {activeCombat?.dungeonInfo ? `➡️ ${t.nextEnemy}` : `⚔️ ${t.startCombatButton}`}
                         </Text>
-                    </TouchableOpacity>
+                    </AnimatedPressable>
                     <TouchableOpacity
                         style={[styles.smallButton, { backgroundColor: theme.secondary, borderColor: theme.border }]}
                         onPress={onBackToMenu}
@@ -54,7 +55,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 </>
             ) : (
                 <View style={styles.combatActions}>
-                    <TouchableOpacity
+                    <AnimatedPressable
                         style={[
                             styles.actionButton,
                             { backgroundColor: theme.danger, borderColor: theme.border, opacity: playerTurn && !loading ? 1 : 0.5 }
@@ -65,9 +66,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <Text style={[styles.actionText, { color: theme.textLight }]}>
                             ⚔️ {t.attack?.toUpperCase()}
                         </Text>
-                    </TouchableOpacity>
+                    </AnimatedPressable>
 
-                    <TouchableOpacity
+                    <AnimatedPressable
                         style={[
                             styles.actionButton,
                             {
@@ -81,7 +82,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         disabled={!playerTurn || loading}
                     >
                         <Text style={[styles.actionText, { color: theme.textLight }]}>{t.skillsIcon}</Text>
-                    </TouchableOpacity>
+                    </AnimatedPressable>
 
                     <View style={styles.secondaryActions}>
                         <TouchableOpacity

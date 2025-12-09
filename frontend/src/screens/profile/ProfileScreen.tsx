@@ -6,6 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { spacing } from '../../theme/spacing';
 import PixelCard from '../../components/UI/Card';
+import ThemeSelector from '../../components/UI/ThemeSelector';
 
 // Avatar imports
 import avatar1 from '../../../assets/images/classes/img1.png';
@@ -34,7 +35,7 @@ const AVATAR_MAP = {
 
 const ProfileScreen = () => {
     const { user, logout, updateUser } = useAuth();
-    const { theme, isDark, toggleTheme } = useTheme();
+    const { theme } = useTheme();
     const { language, toggleLanguage, t } = useLanguage();
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -104,7 +105,7 @@ const ProfileScreen = () => {
                         <Text style={[styles.statLabel, { color: theme.text }]}>{t.gold}</Text>
                     </View>
                     <View style={styles.statBox}>
-                        <Text style={[styles.statValue, { color: theme.accent }]}>{profile?.tetranuta || 0}</Text>
+                        <Text style={[styles.statValue, { color: theme.warning }]}>{profile?.tetranuta || 0}</Text>
                         <Text style={[styles.statLabel, { color: theme.text }]}>Tetranuta</Text>
                     </View>
                     <View style={styles.statBox}>
@@ -122,14 +123,8 @@ const ProfileScreen = () => {
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.settingRow}>
-                    <Text style={[styles.settingLabel, { color: theme.text }]}>{t.theme}</Text>
-                    <Switch
-                        value={isDark}
-                        onValueChange={toggleTheme}
-                        trackColor={{ false: '#767577', true: theme.primary }}
-                        thumbColor={isDark ? theme.secondary : '#f4f3f4'}
-                    />
+                <View style={[styles.settingRow, { flexDirection: 'column', alignItems: 'flex-start' }]}>
+                    <ThemeSelector />
                 </View>
             </PixelCard>
 
@@ -152,27 +147,27 @@ const styles = StyleSheet.create({
         textShadowRadius: 1,
     },
     profileCard: { width: '100%', alignItems: 'center', paddingVertical: spacing.xl, marginBottom: spacing.md, borderWidth: 2 },
-  avatarContainer: {
-    width: '50%',              // tamaño visible del avatar
-    height: '50%',
-    borderRadius: 30,
-    borderWidth: 1,
-    overflow: 'hidden',      // <- recorta lo que sobresale
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-},
+    avatarContainer: {
+        width: '50%',              // tamaño visible del avatar
+        height: '50%',
+        borderRadius: 30,
+        borderWidth: 1,
+        overflow: 'hidden',      // <- recorta lo que sobresale
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: spacing.md,
+    },
 
-avatar: {
-    width: '100%',              // más grande que el contenedor
-    height: '100%',
-    resizeMode: 'cover',
-    transform: [
-        { scale: 1.2 },      // zoom para que nunca queden huecos
-        { translateY: 14 },  // offset vertical
-        // { translateX: ? } si deseas
-    ],
-},
+    avatar: {
+        width: '100%',              // más grande que el contenedor
+        height: '100%',
+        resizeMode: 'cover',
+        transform: [
+            { scale: 1.2 },      // zoom para que nunca queden huecos
+            { translateY: 14 },  // offset vertical
+            // { translateX: ? } si deseas
+        ],
+    },
     username: { fontSize: 26, fontWeight: 'bold', marginBottom: 4 },
     classText: { fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
     email: { fontSize: 15, marginBottom: spacing.md },

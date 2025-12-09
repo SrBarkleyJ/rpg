@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     enemyImage: {
-        width: 210,
-        height: 210,
+        width: 121,
+        height: 121,
     },
     skillAnimationContainer: {
         position: 'absolute',

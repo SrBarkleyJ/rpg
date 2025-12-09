@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, Image, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Image, ImageBackground, TouchableOpacity } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 import apiClient from '../../api/apiClient';
 import { useTheme } from '../../context/ThemeContext';
@@ -10,12 +10,19 @@ import PixelCard from '../../components/UI/Card';
 import ProgressBar from '../../components/UI/ProgressBar';
 import { calculateNextLevelXp } from '../../utils/levelSystem';
 import { AVATAR_MAP } from '../../screens/combat/combatConstants';
+import ProfileSkeleton from '../../components/skeletons/ProfileSkeleton';
+import { useNavigation } from '@react-navigation/native';
+
+
 
 const HomeScreen = () => {
+    const navigation = useNavigation<any>();
     const { user, logout, updateUser } = useAuth();
+
     const { theme } = useTheme();
-    const { t } = useLanguage();
+    const { t, language, toggleLanguage } = useLanguage();
     const [profile, setProfile] = useState(user);
+
     const [refreshing, setRefreshing] = useState(false);
 
     const fetchProfile = async () => {
@@ -47,7 +54,14 @@ const HomeScreen = () => {
         }
     }, [user]);
 
-    if (!profile) return <View style={[styles.container, { backgroundColor: theme.background }]}><Text style={{ color: theme.text }}>{t.loading}</Text></View>;
+    if (!profile) return (
+        <View style={[styles.container, { backgroundColor: theme.background, padding: spacing.md }]}>
+            <View style={styles.header}>
+                <Text style={[styles.headerTitle, theme.typography.h1, { color: theme.textLight }]}>{t.homeTitle}</Text>
+            </View>
+            <ProfileSkeleton />
+        </View>
+    );
 
     const nextLevelXp = calculateNextLevelXp(profile.level);
     const avatarSource = AVATAR_MAP[profile?.avatar];
@@ -87,7 +101,7 @@ const HomeScreen = () => {
                             <Text style={[styles.statLabel, theme.typography.small, { color: theme.textLight }]}>{t.gold}</Text>
                         </View>
                         <View style={styles.statItem}>
-                            <Text style={[styles.statValue, theme.typography.h3, { color: theme.accent }]}>{profile?.tetranuta || 0}</Text>
+                            <Text style={[styles.statValue, theme.typography.h3, { color: theme.primary }]}>{profile?.tetranuta || 0}</Text>
                             <Text style={[styles.statLabel, theme.typography.small, { color: theme.textLight }]}>{t.tetranuta}</Text>
                         </View>
                     </View>
@@ -122,6 +136,9 @@ const HomeScreen = () => {
                     <Text style={[theme.typography.body, { color: theme.text }]}>{t.completedQuests}: {profile.completedQuests?.length || 0}</Text>
                 </PixelCard>
 
+
+
+
             </ScrollView>
         </View>
     );
@@ -133,7 +150,8 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: spacing.md,
-        paddingTop: spacing.xl * 2,
+        paddingTop: spacing.xl,
+        paddingBottom: 90,
     },
     header: {
         marginBottom: spacing.lg,
@@ -157,11 +175,11 @@ const styles = StyleSheet.create({
     avatarContainer: {
         width: '50%',  // Increased size
         height: 333, // Increased size
-        borderRadius: 90,
+        borderRadius: 10,
         borderWidth: 4,
         overflow: 'hidden',
         marginBottom: spacing.md,
-        backgroundColor: '#000',
+        backgroundColor: '#585855ff',
     },
     avatar: {
         width: '100%',
@@ -174,6 +192,7 @@ const styles = StyleSheet.create({
     username: {
         marginBottom: 4,
     },
+
     classText: {
         marginBottom: 4,
         fontStyle: 'italic',

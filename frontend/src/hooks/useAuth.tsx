@@ -17,11 +17,16 @@ export const AuthProvider = ({ children }) => {
                 );
 
                 const loadPromise = async () => {
-                    const token = await AsyncStorage.getItem('token');
-                    const userData = await AsyncStorage.getItem('user');
-                    if (token && userData) {
-                        setUser(JSON.parse(userData));
-                    }
+                    // console.log('[AuthProvider] Checking AsyncStorage...');
+                    // const token = await AsyncStorage.getItem('token');
+                    // const userData = await AsyncStorage.getItem('user');
+                    // console.log('[AuthProvider] Token:', !!token, 'UserData:', !!userData);
+                    // if (token && userData) {
+                    //     setUser(JSON.parse(userData));
+                    // }
+
+                    // Force User to null to ensure Login Screen appears first
+                    setUser(null);
                 };
 
                 await Promise.race([loadPromise(), timeoutPromise]);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import PlayerAvatar from './PlayerAvatar';
 import EnemyDisplay from './EnemyDisplay';
@@ -17,6 +17,7 @@ interface CombatAreaProps {
     playerTranslateX: Animated.Value;
     playerScale: Animated.Value;
     skillAnimation?: React.ReactNode;
+    style?: object;
 }
 
 const CombatArea = ({
@@ -30,12 +31,13 @@ const CombatArea = ({
     lastDamage,
     playerTranslateX,
     playerScale,
-    skillAnimation
+    skillAnimation,
+    style
 }: CombatAreaProps) => {
     const { theme } = useTheme();
 
     return (
-        <View style={styles.combatArea}>
+        <View style={[styles.combatArea, style]}>
             {/* Player Avatar (Left) */}
             <View style={styles.playerContainer}>
                 <Animated.View
@@ -79,8 +81,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: spacing.md,
-        height: 350,
+        marginBottom: 0,
+        paddingVertical: 0,
     },
     playerContainer: {
         flex: 1,

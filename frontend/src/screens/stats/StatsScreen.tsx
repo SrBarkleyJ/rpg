@@ -126,7 +126,7 @@ const StatsScreen = () => {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    scrollContent: { padding: spacing.md, paddingTop: spacing.xl * 2 },
+    scrollContent: { padding: spacing.md, paddingTop: spacing.xl * 2, paddingBottom: 90 },
     header: { alignItems: 'center', marginBottom: spacing.lg },
     headerTitle: {
 

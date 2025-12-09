@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, Image, Dimensions } from 'react-native';
 import rewardApi from '../../api/rewardApi';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../context/ThemeContext';
@@ -8,6 +8,8 @@ import { useLanguage } from '../../context/LanguageContext';
 import { spacing } from '../../theme/spacing';
 import PixelCard from '../../components/UI/Card';
 import { getItemImage } from '../../config/itemImages';
+import { hapticSuccess } from '../../utils/haptics';
+import AnimatedPressable from '../../components/UI/AnimatedPressable';
 
 const ShopScreen = () => {
     const [items, setItems] = useState<any[]>([]);
@@ -56,6 +58,7 @@ const ShopScreen = () => {
             const result = await rewardApi.buyReward(item._id);
             if (result.user) {
                 await updateUser(result.user);
+                hapticSuccess();
                 Alert.alert(t.success, `${t.buySuccess} ${translateItem(item.name)}!`);
             }
         } catch (error) {
@@ -113,19 +116,21 @@ const ShopScreen = () => {
 
                 <View style={styles.textContainer}>
                     <Text style={[styles.itemName, theme.typography.h3, { color: getRarityColor(item.rarity) }]}>{name}</Text>
-                    <Text style={[styles.itemType, theme.typography.small, { color: theme.text, opacity: 0.7 }]}>{item.type}</Text>
+                    <Text style={[styles.itemType, theme.typography.small, { color: theme.text, opacity: 0.7 }]}>
+                        {t[item.type] || item.type} • {t[item.rarity] || item.rarity}
+                    </Text>
                 </View>
 
                 <View style={styles.priceContainer}>
                     <Text style={[styles.priceText, theme.typography.bodyBold, { color: theme.warning }]}>{item.cost} {t.gold}</Text>
                 </View>
 
-                <TouchableOpacity
+                <AnimatedPressable
                     style={[styles.buyButton, { backgroundColor: theme.primary, borderColor: theme.border }]}
                     onPress={() => handleBuyItem(item)}
                 >
                     <Text style={[styles.buyButtonText, theme.typography.bodyBold, { color: theme.textLight }]}>{t.buy}</Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
             </PixelCard>
         );
     };
@@ -195,12 +200,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.sm,
     },
     headerTitle: {
-
-
+        fontSize: 24,
+        fontWeight: 'bold',
         letterSpacing: 2,
         textShadowColor: 'black',
         textShadowOffset: { width: 2, height: 2 },
         textShadowRadius: 1,
+        flex: 1,
+        textAlign: 'center',
     },
     goldContainer: {
         paddingHorizontal: 12,
@@ -209,8 +216,8 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
     goldText: {
-
-
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     filterContainer: {
         marginBottom: spacing.md,
@@ -226,17 +233,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     filterText: {
-
-
+        fontSize: 14,
+        fontWeight: 'bold',
     },
+
     listContent: {
-        paddingBottom: spacing.xl,
+        paddingBottom: 90,
     },
     columnWrapper: {
         justifyContent: 'space-between',
     },
     itemCard: {
-        width: '48%',
+        width: (Dimensions.get('window').width / 2) - spacing.md - 4, // Calculate width: half screen minus padding
         marginBottom: spacing.md,
         padding: spacing.sm,
         alignItems: 'center',
@@ -244,36 +252,38 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         width: '100%',
-        height: 100,
+        height: Dimensions.get('window').width * 0.35, // Height is 35% of screen width (square-ish)
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: spacing.sm,
+        backgroundColor: '#FFFFFF', // White background as requested
     },
     itemImage: {
-        width: 80,
-        height: 80,
+        width: '80%',    // Responsive to container
+        height: '80%',
     },
     itemEmoji: {
-
+        fontSize: Dimensions.get('window').width * 0.1, // Responsive font
     },
     textContainer: {
         width: '100%',
         alignItems: 'center',
         marginBottom: 4,
+        height: 70, // Fixed height for text area prevents alignment issues
+        justifyContent: 'flex-start'
     },
     itemName: {
-
-
+        fontSize: 14,
+        fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 2,
-        height: 40,
+        marginBottom: 4,
         textShadowColor: 'rgba(0,0,0,0.5)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 1,
     },
     itemType: {
-
+        fontSize: 10,
         marginBottom: spacing.sm,
         textTransform: 'uppercase',
     },
@@ -281,8 +291,8 @@ const styles = StyleSheet.create({
         marginBottom: spacing.sm,
     },
     priceText: {
-
-
+        fontSize: 14,
+        fontWeight: 'bold',
     },
     buyButton: {
         width: '100%',
@@ -292,8 +302,9 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
     buyButtonText: {
-
-
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
     },
 });
 

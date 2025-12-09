@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     list: {
-        paddingBottom: 20,
+        paddingBottom: 90, // Accessibility padding
     },
     card: {
         marginBottom: 16,

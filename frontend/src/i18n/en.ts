@@ -276,6 +276,14 @@ export const en = {
     cat_rogue: 'Rogue',
     cat_armor: 'Armor',
     cat_accessory: 'Accessory',
+    heals: 'Heals',
+
+    // Rarity
+    common: 'Common',
+    uncommon: 'Uncommon',
+    rare: 'Rare',
+    epic: 'Epic',
+    legendary: 'Legendary',
 
     // Item Names (Dictionary)
     item_HealthPotion: 'Health Potion',
@@ -288,6 +296,35 @@ export const en = {
     item_IronArmor: 'Iron Armor',
     item_MagicRobe: 'Magic Robe',
     item_StrengthRing: 'Strength Ring',
+
+    // New Items (Deep RPG)
+    item_MinorHealthPotion: 'Minor Health Potion',
+    item_GreaterHealthPotion: 'Greater Health Potion',
+    item_ElixirofPower: 'Elixir of Power',
+    item_RustySword: 'Rusty Sword',
+    item_IronBroadsword: 'Iron Broadsword',
+    item_SteelClaymore: 'Steel Claymore',
+    item_RuneBlade: 'Rune Blade',
+    item_DragonSlayer: 'Dragon Slayer',
+    item_WoodenStaff: 'Wooden Staff',
+    item_ApprenticeWand: 'Apprentice Wand',
+    item_CrystalStaff: 'Crystal Staff',
+    item_VoidScepter: 'Void Scepter',
+    item_DivineStaff: 'Divine Staff',
+    item_PoisonedKnife: 'Poisoned Knife',
+    item_TwinBlades: 'Twin Blades',
+    item_ShadowBlade: 'Shadow Blade',
+    item_AssassinsEdge: 'Assassin\'s Edge',
+    item_LeatherTunic: 'Leather Tunic',
+    item_ChainmailVest: 'Chainmail Vest',
+    item_PlateArmor: 'Plate Armor',
+    item_NoviceRobe: 'Novice Robe',
+    item_MasterRobe: 'Master Robe',
+    item_GoldRing: 'Gold Ring',
+    item_RingofPower: 'Ring of Power',
+    item_BladeoftheFallenKing: 'Blade of the Fallen King',
+    item_GrimoireofForbiddenKnowledge: 'Grimoire of Forbidden Knowledge',
+    item_DaggerofTime: 'Dagger of Time',
 
     // Enemies
     enemy_crimson_imp: 'Crimson Imp',

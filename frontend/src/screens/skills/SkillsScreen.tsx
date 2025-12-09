@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
 
     },
     skillsContainer: {
-        paddingBottom: spacing.xl,
+        paddingBottom: 90,
     },
     skillCard: {
         marginBottom: spacing.lg,

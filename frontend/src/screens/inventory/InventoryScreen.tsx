@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import Reanimated, { Layout } from 'react-native-reanimated';
 import { useFocusEffect } from '@react-navigation/native';
 import inventoryApi from '../../api/inventoryApi';
 import { useAuth } from '../../hooks/useAuth';
@@ -15,7 +16,7 @@ const InventoryScreen = () => {
     const [filter, setFilter] = useState('all');
     const { user, updateUser } = useAuth();
     const { theme } = useTheme();
-    const { t } = useLanguage();
+    const { t, translateItem } = useLanguage();
 
     useFocusEffect(
         useCallback(() => {
@@ -110,17 +111,20 @@ const InventoryScreen = () => {
         if (!item.details?.effects) return '';
         const effects = item.details.effects;
         const bonuses: string[] = [];
-        if (effects.buffStrength) bonuses.push(`+${effects.buffStrength} STR`);
-        if (effects.buffIntelligence) bonuses.push(`+${effects.buffIntelligence} INT`);
-        if (effects.buffVitality) bonuses.push(`+${effects.buffVitality} VIT`);
-        if (effects.buffDexterity) bonuses.push(`+${effects.buffDexterity} DEX`);
-        if (effects.buffLuck) bonuses.push(`+${effects.buffLuck} LUCK`);
-        if (effects.healHP) bonuses.push(`Heals ${effects.healHP} HP`);
+        if (effects.buffStrength) bonuses.push(`+${effects.buffStrength} ${t.strength}`);
+        if (effects.buffIntelligence) bonuses.push(`+${effects.buffIntelligence} ${t.intelligence}`);
+        if (effects.buffVitality) bonuses.push(`+${effects.buffVitality} ${t.vitality}`);
+        if (effects.buffDexterity) bonuses.push(`+${effects.buffDexterity} ${t.dexterity}`);
+        if (effects.buffLuck) bonuses.push(`+${effects.buffLuck} ${t.luckStat}`);
+        if (effects.healHP) bonuses.push(`${t.heals} ${effects.healHP} ${t.hp}`);
+        if (effects.healMana) bonuses.push(`${t.heals} ${effects.healMana} ${t.mana}`);
         return bonuses.join(', ');
     };
 
     const renderItem = ({ item }) => {
         if (!item.details) return null;
+
+        const name = translateItem(item.details.name);
 
         const canEquip = item.details.type !== 'consumable' && item.details.effects.duration === 0;
         const isEquipped = item.equipped;
@@ -129,79 +133,81 @@ const InventoryScreen = () => {
 
 
         return (
-            <PixelCard style={[styles.itemCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-                <View style={styles.itemContent}>
-                    <View style={[styles.imageContainer, { backgroundColor: theme.background }]}>
-                        {itemImage ? (
-                            <Image
-                                source={itemImage}
-                                style={styles.itemImage}
-                                resizeMode="contain"
-                            />
-                        ) : (
-                            <Text style={[styles.itemEmoji, theme.typography.h1]}>
-                                {item.details.type === 'weapon' ? '⚔️' :
-                                    item.details.type === 'armor' ? '🛡️' :
-                                        item.details.type === 'accessory' ? '💍' :
-                                            '🧪'}
-                            </Text>
-                        )}
-                        {item.quantity > 1 && (
-                            <View style={[styles.quantityBadge, { backgroundColor: theme.primary }]}>
-                                <Text style={[styles.quantityText, theme.typography.caption]}>x{item.quantity}</Text>
-                            </View>
-                        )}
-                    </View>
-
-                    <View style={styles.itemInfo}>
-                        <View style={styles.itemHeader}>
-                            <Text style={[styles.itemName, theme.typography.h3, { color: theme.text }]}>{item.details.name}</Text>
-                            {isEquipped && (
-                                <View style={[styles.equippedBadge, { backgroundColor: theme.success }]}>
-                                    <Text style={[styles.equippedText, theme.typography.caption, { color: theme.textLight }]}>{t.equipped}</Text>
+            <Reanimated.View layout={Layout.springify()}>
+                <PixelCard style={[styles.itemCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+                    <View style={styles.itemContent}>
+                        <View style={[styles.imageContainer, { backgroundColor: '#FFFFFF' }]}>
+                            {itemImage ? (
+                                <Image
+                                    source={itemImage}
+                                    style={styles.itemImage}
+                                    resizeMode="contain"
+                                />
+                            ) : (
+                                <Text style={[styles.itemEmoji, theme.typography.h1]}>
+                                    {item.details.type === 'weapon' ? '⚔️' :
+                                        item.details.type === 'armor' ? '🛡️' :
+                                            item.details.type === 'accessory' ? '💍' :
+                                                '🧪'}
+                                </Text>
+                            )}
+                            {item.quantity > 1 && (
+                                <View style={[styles.quantityBadge, { backgroundColor: theme.primary }]}>
+                                    <Text style={[styles.quantityText, theme.typography.caption]}>x{item.quantity}</Text>
                                 </View>
                             )}
                         </View>
-                        <Text style={[styles.itemType, theme.typography.caption, { color: theme.text }]}>
-                            {t[item.details.type] ? t[item.details.type].toUpperCase() : item.details.type.toUpperCase()}
-                        </Text>
-                        {item.details.desc && (
-                            <Text style={[styles.itemDesc, theme.typography.small, { color: theme.text }]}>{item.details.desc}</Text>
-                        )}
-                        {getStatBonuses(item) && (
-                            <Text style={[styles.itemStats, theme.typography.small, { color: theme.secondary }]}>{getStatBonuses(item)}</Text>
-                        )}
+
+                        <View style={styles.itemInfo}>
+                            <View style={styles.itemHeader}>
+                                <Text style={[styles.itemName, theme.typography.h3, { color: theme.text }]}>{name}</Text>
+                                {isEquipped && (
+                                    <View style={[styles.equippedBadge, { backgroundColor: theme.success }]}>
+                                        <Text style={[styles.equippedText, theme.typography.caption, { color: theme.textLight }]}>{t.equipped}</Text>
+                                    </View>
+                                )}
+                            </View>
+                            <Text style={[styles.itemType, theme.typography.caption, { color: theme.text }]}>
+                                {t[item.details.type] ? t[item.details.type].toUpperCase() : item.details.type.toUpperCase()}
+                            </Text>
+                            {item.details.desc && (
+                                <Text style={[styles.itemDesc, theme.typography.small, { color: theme.text }]}>{item.details.desc}</Text>
+                            )}
+                            {getStatBonuses(item) && (
+                                <Text style={[styles.itemStats, theme.typography.small, { color: theme.secondary }]}>{getStatBonuses(item)}</Text>
+                            )}
+                        </View>
                     </View>
-                </View>
 
-                {canEquip && (
-                    <TouchableOpacity
-                        style={[
-                            styles.actionButton,
-                            { backgroundColor: isEquipped ? theme.danger : theme.primary, borderColor: theme.border }
-                        ]}
-                        onPress={() => isEquipped ? handleUnequip(item._id) : handleEquip(item._id)}
-                    >
-                        <Text style={[styles.actionButtonText, theme.typography.bodyBold, { color: theme.textLight }]}>
-                            {isEquipped ? t.unequip : t.equip}
-                        </Text>
-                    </TouchableOpacity>
-                )}
+                    {canEquip && (
+                        <TouchableOpacity
+                            style={[
+                                styles.actionButton,
+                                { backgroundColor: isEquipped ? theme.danger : theme.primary, borderColor: theme.border }
+                            ]}
+                            onPress={() => isEquipped ? handleUnequip(item._id) : handleEquip(item._id)}
+                        >
+                            <Text style={[styles.actionButtonText, theme.typography.bodyBold, { color: theme.textLight }]}>
+                                {isEquipped ? t.unequip : t.equip}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
 
-                {item.details.type === 'consumable' && (
-                    <TouchableOpacity
-                        style={[
-                            styles.actionButton,
-                            { backgroundColor: theme.success, borderColor: theme.border, marginTop: spacing.sm }
-                        ]}
-                        onPress={() => handleUseItem(item._id)}
-                    >
-                        <Text style={[styles.actionButtonText, theme.typography.bodyBold, { color: theme.textLight }]}>
-                            💊 {t.use || 'USE'}
-                        </Text>
-                    </TouchableOpacity>
-                )}
-            </PixelCard>
+                    {item.details.type === 'consumable' && (
+                        <TouchableOpacity
+                            style={[
+                                styles.actionButton,
+                                { backgroundColor: theme.success, borderColor: theme.border, marginTop: spacing.sm }
+                            ]}
+                            onPress={() => handleUseItem(item._id)}
+                        >
+                            <Text style={[styles.actionButtonText, theme.typography.bodyBold, { color: theme.textLight }]}>
+                                💊 {t.use || 'USE'}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                </PixelCard>
+            </Reanimated.View>
         );
     };
 
@@ -226,7 +232,7 @@ const InventoryScreen = () => {
                     data={getFilteredInventory()}
                     keyExtractor={(item) => item._id}
                     renderItem={renderItem}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={[styles.listContent, { paddingBottom: 90 }]}
                     ListEmptyComponent={
                         <Text style={[styles.emptyText, theme.typography.h3, { color: theme.text }]}>{t.emptyInventory}</Text>
                     }

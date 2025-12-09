@@ -10,6 +10,7 @@ import {
     FlatList,
     Animated,
     Easing,
+    Dimensions,
     AppState
 } from 'react-native';
 import combatApi from '../../api/combatApi';
@@ -39,6 +40,7 @@ import { useCombatAnimations } from '../../hooks/useCombatAnimations';
 import SpriteAnimation from '../../components/combat/SpriteAnimation';
 import FrameAnimation from '../../components/combat/FrameAnimation';
 import { getSkillAnimation, SkillAnimationConfig } from '../../config/skillAnimations';
+import { hapticImpactHeavy, hapticImpactMedium } from '../../utils/haptics';
 
 const CombatScreen = () => {
     const { user, updateUser } = useAuth();
@@ -68,10 +70,10 @@ const CombatScreen = () => {
                 appState.current.match(/inactive|background/) &&
                 nextAppState === 'active'
             ) {
-                console.log('App has come to the foreground!');
+                // console.log('App has come to the foreground!');
                 // Potential logic to resync combat state if needed
             } else if (nextAppState.match(/inactive|background/)) {
-                console.log('App went to background');
+                // console.log('App went to background');
                 // Potential logic to pause heavy animations if strictly necessary
             }
 
@@ -291,9 +293,12 @@ const CombatScreen = () => {
         }
     };
 
+    const processingAction = useRef(false);
+
     // Para manejar acciones, usa el avatarKey en lugar de user?.avatar
     const handleAction = async (action: string, param: string | null = null) => {
-        if (!activeCombat || !playerTurn) return;
+        if (!activeCombat || !playerTurn || processingAction.current) return;
+        processingAction.current = true;
 
         try {
             setLoading(true);
@@ -301,6 +306,7 @@ const CombatScreen = () => {
 
             // Trigger animations
             if (action === 'attack') {
+                hapticImpactHeavy();
                 playBasicAttackAnimation();
             } else if (action === 'skill' && param) {
                 // Activar animación frame-by-frame para la skill
@@ -309,6 +315,7 @@ const CombatScreen = () => {
                     setActiveSkillAnimation(skillAnim);
                 }
                 playSkillAnimation(param, user?.class);
+                hapticImpactMedium();
             } else if (action === 'use-item' && param) {
                 playFlashAnimation('rgba(0, 255, 0, 0.3)', 200);
             } else if (action === 'defend') {
@@ -398,6 +405,7 @@ const CombatScreen = () => {
             setPlayerTurn(true);
         } finally {
             setLoading(false);
+            processingAction.current = false;
         }
     };
 
@@ -529,98 +537,115 @@ const CombatScreen = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Dungeon Info */}
-            {activeCombat?.dungeonInfo && (
-                <View style={[styles.dungeonInfo, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-                    <Text style={[styles.dungeonName, { color: theme.text }]}>
-                        🏰 {activeCombat.dungeonInfo.name}
-                    </Text>
-                    <View style={styles.dungeonProgress}>
-                        <View style={styles.progressBarBg}>
-                            <View
-                                style={[
-                                    styles.progressBarFill,
-                                    {
-                                        backgroundColor: theme.primary,
-                                        width: `${(activeCombat.dungeonInfo.currentEnemy / activeCombat.dungeonInfo.totalEnemies) * 100}%`
-                                    }
-                                ]}
-                            />
+            {/* Content Container with Flex Layout */}
+            <View style={{ flex: 1, gap: spacing.sm }}>
+
+                {/* Dungeon Info - Takes small space if active */}
+                {activeCombat?.dungeonInfo && (
+                    <View style={{ flex: 1, maxHeight: 20 }}>
+                        <View style={[styles.dungeonInfo, { backgroundColor: theme.surface, borderColor: theme.border, flex: 1, paddingVertical: 4 }]}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1 }}>
+                                <Text style={[styles.dungeonName, { color: theme.text, fontSize: 12, marginBottom: 0, flex: 1 }]}>
+                                    🏰 {activeCombat.dungeonInfo.name}
+                                </Text>
+                                <View style={{ width: '40%', marginRight: 8 }}>
+                                    <View style={[styles.progressBarBg, { height: 6, marginBottom: 2 }]}>
+                                        <View
+                                            style={[
+                                                styles.progressBarFill,
+                                                {
+                                                    backgroundColor: theme.primary,
+                                                    width: `${(activeCombat.dungeonInfo.currentEnemy / activeCombat.dungeonInfo.totalEnemies) * 100}%`
+                                                }
+                                            ]}
+                                        />
+                                    </View>
+                                    <Text style={[styles.progressText, { color: theme.secondary, fontSize: 10 }]}>
+                                        {activeCombat.dungeonInfo.currentEnemy + 1}/{activeCombat.dungeonInfo.totalEnemies}
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
-                        <Text style={[styles.progressText, { color: theme.secondary }]}>
-                            {t.enemy} {activeCombat.dungeonInfo.currentEnemy + 1} {t.of} {activeCombat.dungeonInfo.totalEnemies}
-                        </Text>
                     </View>
+                )}
+
+                {/* Combat Area - Main focus (approx 40%) */}
+                <View style={{ flex: 5, justifyContent: 'center' }}>
+                    <CombatArea
+                        user={user}
+                        avatarKey={avatarKey}
+                        activeCombat={activeCombat}
+                        enemyShake={enemyShake}
+                        enemyOpacity={enemyOpacity}
+                        damageNumberOpacity={damageNumberOpacity}
+                        damageNumberY={damageNumberY}
+                        lastDamage={lastDamage}
+                        playerTranslateX={playerTranslateX}
+                        playerScale={playerScale}
+                        skillAnimation={
+                            activeSkillAnimation ? (
+                                <FrameAnimation
+                                    frames={activeSkillAnimation.frames}
+                                    fps={activeSkillAnimation.fps}
+                                    size={activeSkillAnimation.size}
+                                    tintColor={activeSkillAnimation.tintColor}
+                                    travelling={activeSkillAnimation.travelling}
+                                    rotation={activeSkillAnimation.rotation}
+                                    loop={false}
+                                    onComplete={() => setActiveSkillAnimation(null)}
+                                />
+                            ) : undefined
+                        }
+                        style={{ flex: 1 }}
+                    />
                 </View>
-            )}
 
-            {/* Combat Area usando el componente separado */}
-            <CombatArea
-                user={user}
-                avatarKey={avatarKey}
-                activeCombat={activeCombat}
-                enemyShake={enemyShake}
-                enemyOpacity={enemyOpacity}
-                damageNumberOpacity={damageNumberOpacity}
-                damageNumberY={damageNumberY}
-                lastDamage={lastDamage}
-                playerTranslateX={playerTranslateX}
-                playerScale={playerScale}
-                skillAnimation={
-                    activeSkillAnimation ? (
-                        <FrameAnimation
-                            frames={activeSkillAnimation.frames}
-                            fps={activeSkillAnimation.fps}
-                            size={activeSkillAnimation.size}
-                            tintColor={activeSkillAnimation.tintColor}
-                            travelling={activeSkillAnimation.travelling}
-                            rotation={activeSkillAnimation.rotation}
-                            loop={false}
-                            onComplete={() => setActiveSkillAnimation(null)}
-                        />
-                    ) : undefined
-                }
-            />
+                {/* Turn Indicator - Small strip */}
+                {activeCombat && activeCombat.status === 'active' && (
+                    <View style={{ height: 30 }}>
+                        <View style={[styles.turnIndicator, { backgroundColor: playerTurn ? theme.success : theme.danger, flex: 1, padding: 0, justifyContent: 'center', marginBottom: 0 }]}>
+                            <Text style={[styles.turnText, { color: theme.textLight, fontSize: 14 }]}>
+                                {playerTurn ? `⚔️ ${t.yourTurn}` : `🛡️ ${t.enemyTurnLabel}`}
+                            </Text>
+                        </View>
+                    </View>
+                )}
 
-            {/* Turn Indicator */}
-            {activeCombat && activeCombat.status === 'active' && (
-                <View style={[styles.turnIndicator, { backgroundColor: playerTurn ? theme.success : theme.danger }]}>
-                    <Text style={[styles.turnText, { color: theme.textLight }]}>
-                        {playerTurn ? `⚔️ ${t.yourTurn}` : `🛡️ ${t.enemyTurnLabel}`}
-                    </Text>
+                {/* Stats - Consistent space */}
+                <View style={{ flex: 2, justifyContent: 'center' }}>
+                    <CombatStats
+                        user={user}
+                        activeCombat={activeCombat}
+                        defending={defending}
+                        theme={theme}
+                    />
                 </View>
-            )}
 
-            {/* Stats usando componente separado */}
-            <CombatStats
-                user={user}
-                activeCombat={activeCombat}
-                defending={defending}
-                theme={theme}
-            />
-
-            {/* Action Buttons usando componente separado */}
-            <ActionButtons
-                activeCombat={activeCombat}
-                playerTurn={playerTurn}
-                loading={loading}
-                combatMode={combatMode}
-                onInitiateCombat={handleInitiateCombat}
-                onAttack={() => handleAction('attack')}
-                onDefend={() => handleAction('defend')}
-                onOpenSkills={() => setSkillsVisible(true)}
-                onOpenInventory={() => {
-                    loadPopulatedInventory();
-                    setInventoryVisible(true);
-                }}
-                onBackToMenu={() => {
-                    setCombatMode(null);
-                    setActiveCombat(null);
-                    setLogs([]);
-                }}
-                theme={theme}
-                t={t}
-            />
+                {/* Action Buttons - Controls at bottom (approx 30%) */}
+                <View style={{ flex: 3 }}>
+                    <ActionButtons
+                        activeCombat={activeCombat}
+                        playerTurn={playerTurn}
+                        loading={loading}
+                        combatMode={combatMode}
+                        onInitiateCombat={handleInitiateCombat}
+                        onAttack={() => handleAction('attack')}
+                        onDefend={() => handleAction('defend')}
+                        onOpenSkills={() => setSkillsVisible(true)}
+                        onOpenInventory={() => {
+                            loadPopulatedInventory();
+                            setInventoryVisible(true);
+                        }}
+                        onBackToMenu={() => {
+                            setCombatMode(null);
+                            setActiveCombat(null);
+                            setLogs([]);
+                        }}
+                        theme={theme}
+                        t={t}
+                    />
+                </View>
+            </View>
 
             <CombatResultModal
                 visible={resultModalVisible}
@@ -669,21 +694,24 @@ const CombatScreen = () => {
     );
 };
 
+const { width, height } = Dimensions.get('window');
+
 // Estilos completos
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: spacing.md,
+        paddingBottom: 90, // Accessibility padding for Menu
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: spacing.md,
-        marginTop: spacing.md,
+        marginTop: height * 0.02, // 2% of screen height
     },
     headerTitle: {
-        fontSize: 24,
+        fontSize: width * 0.06, // Responsive font size
         fontWeight: 'bold',
         letterSpacing: 2,
         textShadowColor: 'black',
@@ -733,13 +761,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     turnIndicator: {
-        padding: spacing.sm,
+        padding: 2,
         alignItems: 'center',
         marginBottom: spacing.md,
         borderRadius: 4,
     },
     turnText: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: 'bold',
         letterSpacing: 1,
     },
@@ -747,10 +775,10 @@ const styles = StyleSheet.create({
     statsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: spacing.md,
+        marginBottom: spacing.sm,
     },
     statCard: {
-        flex: 1,
+        flex: 2,
         marginHorizontal: 4,
         padding: spacing.sm,
         borderWidth: 2,
@@ -769,7 +797,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         marginBottom: spacing.md,
         padding: spacing.sm,
-        minHeight: 150,
+        minHeight: height * 0.2, // 20% of screen height
     },
     logContent: {
         paddingBottom: spacing.md,
@@ -800,7 +828,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     smallButton: {
-        flex: 1,
+        flex: 2,
         paddingVertical: 12,
         alignItems: 'center',
         borderRadius: 4,

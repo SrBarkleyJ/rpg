@@ -197,17 +197,21 @@ export interface AutoCombatResult {
 
 // ===== Theme Types =====
 export interface Theme {
-    primary: string;
-    secondary: string;
+    id: string; // 'midnight' | 'parchment' | 'dungeon' | etc
     background: string;
     surface: string;
-    text: string;
-    textLight: string;
-    border: string;
+    primary: string;
+    secondary: string;
     success: string;
     danger: string;
     warning: string;
-    info: string;
+    text: string;
+    textSecondary: string;
+    textLight: string;
+    border: string;
+    xpBar: string;
+    hpBar: string;
+    typography: any; // Keeping existing loose type for fonts
 }
 
 // ===== Context Types =====
@@ -231,8 +235,9 @@ export interface RegisterData {
 
 export interface ThemeContextType {
     theme: Theme;
-    isDark: boolean;
-    toggleTheme: () => void;
+    currentTheme: string;
+    setTheme: (themeId: string) => void;
+    availableThemes: { id: string; name: string; icon: string }[];
 }
 
 export interface LanguageContextType {

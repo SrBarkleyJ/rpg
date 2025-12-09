@@ -11,7 +11,8 @@
         "seed:tasks": "node src/seed/seedTasks.js",
         "seed:combat": "node seeds/index.js",
         "notify:daily": "node src/utils/notifyUsers.js daily",
-        "notify:weekly": "node src/utils/notifyUsers.js weekly"
+        "notify:weekly": "node src/utils/notifyUsers.js weekly",
+        "tunnel": "npx localtunnel --port 4000"
     },
     "dependencies": {
         "bcrypt": "^5.1.0",

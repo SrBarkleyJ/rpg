@@ -279,6 +279,14 @@ export const es = {
     cat_rogue: 'Pícaro',
     cat_armor: 'Armadura',
     cat_accessory: 'Accesorio',
+    heals: 'Cura',
+
+    // Rarity
+    common: 'Común',
+    uncommon: 'Poco Común',
+    rare: 'Raro',
+    epic: 'Épico',
+    legendary: 'Legendario',
 
     // Item Names (Dictionary)
     item_HealthPotion: 'Poción de Salud',
@@ -291,6 +299,35 @@ export const es = {
     item_IronArmor: 'Armadura de Hierro',
     item_MagicRobe: 'Túnica Mágica',
     item_StrengthRing: 'Anillo de Fuerza',
+
+    // New Items (Deep RPG)
+    item_MinorHealthPotion: 'Poción de Salud Menor',
+    item_GreaterHealthPotion: 'Poción de Salud Mayor',
+    item_ElixirofPower: 'Elixir de Poder',
+    item_RustySword: 'Espada Oxidada',
+    item_IronBroadsword: 'Espadón de Hierro',
+    item_SteelClaymore: 'Claymore de Acero',
+    item_RuneBlade: 'Hoja Rúnica',
+    item_DragonSlayer: 'Matadragones',
+    item_WoodenStaff: 'Bastón de Madera',
+    item_ApprenticeWand: 'Varita de Aprendiz',
+    item_CrystalStaff: 'Bastón de Cristal',
+    item_VoidScepter: 'Cetro del Vacío',
+    item_DivineStaff: 'Bastón Divino',
+    item_PoisonedKnife: 'Cuchillo Envenenado',
+    item_TwinBlades: 'Hojas Gemelas',
+    item_ShadowBlade: 'Hoja de las Sombras',
+    item_AssassinsEdge: 'Filo del Asesino',
+    item_LeatherTunic: 'Túnica de Cuero',
+    item_ChainmailVest: 'Chaleco de Malla',
+    item_PlateArmor: 'Armadura de Placas',
+    item_NoviceRobe: 'Túnica de Novato',
+    item_MasterRobe: 'Túnica de Maestro',
+    item_GoldRing: 'Anillo de Oro',
+    item_RingofPower: 'Anillo de Poder',
+    item_BladeoftheFallenKing: 'Hoja del Rey Caído',
+    item_GrimoireofForbiddenKnowledge: 'Grimorio del Conocimiento Prohibido',
+    item_DaggerofTime: 'Daga del Tiempo',
 
     // Enemies
     enemy_crimson_imp: 'Diablillo Carmesí',

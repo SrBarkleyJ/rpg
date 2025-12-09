@@ -3,13 +3,14 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AuthNavigator from './AuthNavigator';
-import DrawerNavigator from './DrawerNavigator';
+import MainTabs from './TabNavigator';
 import { useAuth } from '../hooks/useAuth';
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
     const { user, isLoading } = useAuth();
+    // console.log('[AppNavigator] isLoading:', isLoading, 'User:', user ? 'Logged In' : 'No Session');
 
     if (isLoading) {
         return (
@@ -24,7 +25,11 @@ const AppNavigator = () => {
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {user ? (
-                    <Stack.Screen name="Main" component={DrawerNavigator} />
+                    // Use lazy loading for the entire TabNavigator to be safe
+                    <Stack.Screen
+                        name="Main"
+                        component={MainTabs}
+                    />
                 ) : (
                     <Stack.Screen name="Auth" component={AuthNavigator} />
                 )}

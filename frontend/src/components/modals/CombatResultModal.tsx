@@ -74,16 +74,11 @@ const CombatResultModal: React.FC<CombatResultModalProps> = ({ visible, type, da
                                     </View>
                                 )}
 
-                                {data.dungeonComplete ? (
+                                {data.dungeonComplete && (
                                     <View style={[styles.infoContainer, { backgroundColor: theme.primary }]}>
                                         <Text style={[styles.infoText, theme.typography.bodyBold, { color: theme.textLight }]}>
                                             {t.dungeonCompleted || 'DUNGEON COMPLETED!'}
                                         </Text>
-                                    </View>
-                                ) : data.nextEnemy && (
-                                    <View style={[styles.infoContainer, { backgroundColor: theme.secondary }]}>
-                                        <Text style={[styles.infoLabel, theme.typography.small, { color: theme.textLight }]}>{t.nextEnemy || 'NEXT ENEMY'}</Text>
-                                        <Text style={[styles.infoText, theme.typography.bodyBold, { color: theme.textLight }]}>{data.nextEnemy.name}</Text>
                                     </View>
                                 )}
                             </>

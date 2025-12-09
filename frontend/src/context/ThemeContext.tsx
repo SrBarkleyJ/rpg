@@ -1,47 +1,111 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { typography } from './fonts';
+import { Theme, ThemeContextType } from '../types';
 
-const ThemeContext = createContext<any>({});
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// Refined Dark Theme (Midnight Blue/Deep Space)
-const darkTheme = {
-    background: '#0a0a23', // Deep midnight blue
-    surface: '#151538',    // Slightly lighter blue/purple for cards
-    primary: '#6c5ce7',    // Vibrant purple for accents/buttons
-    secondary: '#a29bfe',  // Soft lavender for secondary text/icons
-    success: '#00b894',    // Bright teal green
-    danger: '#ff7675',     // Soft red
-    warning: '#fdcb6e',    // Muted gold
-    text: '#dfe6e9',       // Off-white text (easier on eyes)
-    textSecondary: '#b2bec3',
-    textLight: '#ffffff',
-    border: '#2d3436',     // Dark grey border
-    xpBar: '#0984e3',
-    hpBar: '#d63031',
-    typography,
+// ============================================
+// THEME DEFINITIONS
+// ============================================
+const THEMES: Record<string, Theme> = {
+    midnight: {
+        id: 'midnight',
+        background: '#0a0a23',
+        surface: '#151538',
+        primary: '#6c5ce7',
+        secondary: '#a29bfe',
+        success: '#00b894',
+        danger: '#ff7675',
+        warning: '#fdcb6e',
+        text: '#dfe6e9',
+        textSecondary: '#b2bec3',
+        textLight: '#ffffff',
+        border: '#2d3436',
+        xpBar: '#0984e3',
+        hpBar: '#d63031',
+        typography,
+    },
+    parchment: {
+        id: 'parchment',
+        background: '#f7f1e3', // Lighter parchment
+        surface: '#fffaf0',
+        primary: '#2d3436', // Dark ink
+        secondary: '#636e72',
+        success: '#27ae60',
+        danger: '#c0392b',
+        warning: '#f39c12',
+        text: '#2d3436',
+        textSecondary: '#636e72',
+        textLight: '#ffffff', // For buttons with primary bg
+        border: '#d1ccc0',
+        xpBar: '#2980b9',
+        hpBar: '#c0392b',
+        typography,
+    },
+    dungeon: {
+        id: 'dungeon',
+        background: '#1a1a1a', // Charcoal
+        surface: '#2d2d2d',    // Stone
+        primary: '#f1c40f',    // Gold
+        secondary: '#95a5a6',  // Silver/Iron
+        success: '#2ecc71',
+        danger: '#e74c3c',
+        warning: '#f39c12',
+        text: '#ecf0f1',
+        textSecondary: '#bdc3c7',
+        textLight: '#ffffff',
+        border: '#4a4a4a',
+        xpBar: '#f1c40f', // XP is Gold here
+        hpBar: '#c0392b',
+        typography,
+    },
+    forest: {
+        id: 'forest',
+        background: '#052e16', // Deep Forest Green
+        surface: '#14532d',    // Leaf Green
+        primary: '#4ade80',    // Bright Emerald
+        secondary: '#a3b18a',  // Sage
+        success: '#86efac',
+        danger: '#f87171',
+        warning: '#facc15',
+        text: '#f0fdf4',
+        textSecondary: '#bbf7d0',
+        textLight: '#ffffff',
+        border: '#166534',
+        xpBar: '#22c55e',
+        hpBar: '#dc2626',
+        typography,
+    },
+    bloodmoon: {
+        id: 'bloodmoon',
+        background: '#000000', // Pure Black
+        surface: '#1c1c1c',    // Dark Grey
+        primary: '#ff4757',    // Crimson
+        secondary: '#747d8c',  // Steel
+        success: '#2ed573',
+        danger: '#ff4757',
+        warning: '#ffa502',
+        text: '#f1f2f6',
+        textSecondary: '#ced6e0',
+        textLight: '#ffffff',
+        border: '#2f3542',
+        xpBar: '#5352ed',
+        hpBar: '#ff4757',
+        typography,
+    }
 };
 
-// Refined Light Theme (Parchment/Map)
-const lightTheme = {
-    background: '#d0ccc940', // Parchment color
-    surface: '#ffffff',    // White cards
-    primary: '#cdd62b79',    // Dark slate blue (Classic RPG ink color)
-    secondary: '#8e44ad',  // Purple accent
-    success: '#27ae60',
-    danger: '#c0392b',
-    warning: '#f39c12',
-    text: '#0e0f0fff',       // Dark grey text
-    textSecondary: '#353839ff',
-    textLight: '#f7f1e3',  // Light text for dark buttons
-    border: '#d1ccc0',     // Light beige border
-    xpBar: '#2980b9',
-    hpBar: '#c0392b',
-    typography,
-};
+const AVAILABLE_THEMES = [
+    { id: 'midnight', name: 'Midnight', icon: '🌙' },
+    { id: 'parchment', name: 'Parchment', icon: '📜' },
+    { id: 'dungeon', name: 'Dungeon', icon: '🏰' },
+    { id: 'forest', name: 'Forest', icon: '🌲' },
+    { id: 'bloodmoon', name: 'Blood Moon', icon: '🧛' },
+];
 
 export const ThemeProvider = ({ children }: any) => {
-    const [isDark, setIsDark] = useState(true);
+    const [currentTheme, setCurrentTheme] = useState<string>('midnight');
 
     useEffect(() => {
         loadTheme();
@@ -49,25 +113,31 @@ export const ThemeProvider = ({ children }: any) => {
 
     const loadTheme = async () => {
         try {
-            const savedTheme = await AsyncStorage.getItem('theme');
-            if (savedTheme) {
-                setIsDark(savedTheme === 'dark');
+            const savedTheme = await AsyncStorage.getItem('theme_id');
+            if (savedTheme && THEMES[savedTheme]) {
+                setCurrentTheme(savedTheme);
             }
         } catch (error) {
             console.error('Failed to load theme:', error);
         }
     };
 
-    const toggleTheme = async () => {
-        const newTheme = !isDark;
-        setIsDark(newTheme);
-        await AsyncStorage.setItem('theme', newTheme ? 'dark' : 'light');
+    const setTheme = async (themeId: string) => {
+        if (THEMES[themeId]) {
+            setCurrentTheme(themeId);
+            await AsyncStorage.setItem('theme_id', themeId);
+        }
     };
 
-    const theme = isDark ? darkTheme : lightTheme;
+    const theme = THEMES[currentTheme];
 
     return (
-        <ThemeContext.Provider value={{ theme, isDark, toggleTheme }}>
+        <ThemeContext.Provider value={{
+            theme,
+            currentTheme,
+            setTheme,
+            availableThemes: AVAILABLE_THEMES
+        }}>
             {children}
         </ThemeContext.Provider>
     );

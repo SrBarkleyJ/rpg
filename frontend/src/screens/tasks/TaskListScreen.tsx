@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, RefreshControl, Image, Animated, Dimensions, Easing } from 'react-native';
+import Reanimated, { Layout } from 'react-native-reanimated';
 import { useFocusEffect } from '@react-navigation/native';
 import taskApi from '../../api/taskApi';
 import { useAuth } from '../../hooks/useAuth';
@@ -7,6 +8,10 @@ import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { spacing } from '../../theme/spacing';
 import PixelCard from '../../components/UI/Card';
+import { hapticSuccess } from '../../utils/haptics';
+import AnimatedPressable from '../../components/UI/AnimatedPressable';
+import TaskListSkeleton from '../../components/skeletons/TaskListSkeleton';
+
 
 // Image import
 import swordImage from '../../../assets/images/sword_basic.jpg';
@@ -28,56 +33,7 @@ interface Task {
     type: 'system' | 'user';
 }
 
-const ConfettiParticle = ({ delay, startX }: { delay: number; startX: number }) => {
-    const animatedValue = useRef(new Animated.Value(0)).current;
 
-    useEffect(() => {
-        Animated.loop(
-            Animated.sequence([
-                Animated.timing(animatedValue, {
-                    toValue: 1,
-                    duration: 3000 + Math.random() * 2000,
-                    easing: Easing.linear,
-                    useNativeDriver: true,
-                    delay: delay
-                }),
-                Animated.timing(animatedValue, {
-                    toValue: 0,
-                    duration: 0,
-                    useNativeDriver: true
-                })
-            ])
-        ).start();
-    }, []);
-
-    const translateY = animatedValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [-50, height + 50]
-    });
-
-    const rotate = animatedValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '360deg']
-    });
-
-    const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff', 'gold'];
-    const color = colors[Math.floor(Math.random() * colors.length)];
-
-    return (
-        <Animated.View
-            style={{
-                position: 'absolute',
-                left: startX,
-                top: 0,
-                width: 10,
-                height: 10,
-                backgroundColor: color,
-                transform: [{ translateY }, { rotate }],
-                zIndex: 999
-            }}
-        />
-    );
-};
 
 const TaskListScreen = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -143,6 +99,8 @@ const TaskListScreen = () => {
                 await updateUser(result.user);
                 updatedUser = result.user; // Update local reference for check
             }
+
+            hapticSuccess(); // Trigger haptic success
 
             let message = `${t.completed}💰 +${result.goldGained} ${t.gold}⭐+${result.xpGained} ${t.xp}`;
 
@@ -274,46 +232,48 @@ const TaskListScreen = () => {
             const difficultyLabel = getDifficultyLabel(item.difficulty);
 
             return (
-                <PixelCard style={[styles.taskCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-                    <View style={styles.taskHeader}>
-                        <View style={styles.titleContainer}>
-                            <Text style={[styles.taskTitle, theme.typography.h3, { color: theme.text }]}>{title}</Text>
-                            {/* Removed Badge from here as it's redundant with tabs */}
+                <Reanimated.View layout={Layout.springify()}>
+                    <PixelCard style={[styles.taskCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+                        <View style={styles.taskHeader}>
+                            <View style={styles.titleContainer}>
+                                <Text style={[styles.taskTitle, theme.typography.h3, { color: theme.text }]}>{title}</Text>
+                                {/* Removed Badge from here as it's redundant with tabs */}
+                            </View>
+                            <View style={[styles.difficultyBadge, { borderColor: getDifficultyColor(item.difficulty) }]}>
+                                <Text style={[styles.difficultyText, theme.typography.small, { color: getDifficultyColor(item.difficulty) }]}>
+                                    {t[difficultyLabel] || difficultyLabel.toUpperCase()}
+                                </Text>
+                            </View>
                         </View>
-                        <View style={[styles.difficultyBadge, { borderColor: getDifficultyColor(item.difficulty) }]}>
-                            <Text style={[styles.difficultyText, theme.typography.small, { color: getDifficultyColor(item.difficulty) }]}>
-                                {t[difficultyLabel] || difficultyLabel.toUpperCase()}
+
+                        {description && (
+                            <Text style={[styles.taskDescription, theme.typography.body, { color: theme.text }]}>{description}</Text>
+                        )}
+
+                        <View style={styles.rewardsContainer}>
+                            <Text style={[styles.rewardText, theme.typography.bodyBold, { color: theme.text }]}>{t.reward}: </Text>
+                            <Text style={[styles.xpText, theme.typography.bodyBold, { color: theme.secondary }]}>{item.rewardXP} {t.xp}</Text>
+                            <Text style={[styles.goldText, theme.typography.bodyBold, { color: theme.warning }]}> | {item.rewardGold} {t.gold}</Text>
+                        </View>
+
+                        <AnimatedPressable
+                            style={[
+                                styles.completeButton,
+                                {
+                                    backgroundColor: isDisabled ? theme.border : theme.success,
+                                    borderColor: theme.border
+                                },
+                                isDisabled && styles.completedButton
+                            ]}
+                            onPress={() => handleCompleteTask(item._id)}
+                            disabled={isDisabled}
+                        >
+                            <Text style={[styles.buttonText, theme.typography.h3, { color: theme.textLight }]}>
+                                {isCooldown ? `⏳ ${timeRemaining}` : (isCompleted ? t.completed : t.complete)}
                             </Text>
-                        </View>
-                    </View>
-
-                    {description && (
-                        <Text style={[styles.taskDescription, theme.typography.body, { color: theme.text }]}>{description}</Text>
-                    )}
-
-                    <View style={styles.rewardsContainer}>
-                        <Text style={[styles.rewardText, theme.typography.bodyBold, { color: theme.text }]}>{t.reward}: </Text>
-                        <Text style={[styles.xpText, theme.typography.bodyBold, { color: theme.secondary }]}>{item.rewardXP} {t.xp}</Text>
-                        <Text style={[styles.goldText, theme.typography.bodyBold, { color: theme.warning }]}> | {item.rewardGold} {t.gold}</Text>
-                    </View>
-
-                    <TouchableOpacity
-                        style={[
-                            styles.completeButton,
-                            {
-                                backgroundColor: isDisabled ? theme.border : theme.success,
-                                borderColor: theme.border
-                            },
-                            isDisabled && styles.completedButton
-                        ]}
-                        onPress={() => handleCompleteTask(item._id)}
-                        disabled={isDisabled}
-                    >
-                        <Text style={[styles.buttonText, theme.typography.h3, { color: theme.textLight }]}>
-                            {isCooldown ? `⏳ ${timeRemaining}` : (isCompleted ? t.completed : t.complete)}
-                        </Text>
-                    </TouchableOpacity>
-                </PixelCard>
+                        </AnimatedPressable>
+                    </PixelCard>
+                </Reanimated.View>
             );
         } catch (error) {
             console.error('Error rendering task item:', error);
@@ -322,10 +282,7 @@ const TaskListScreen = () => {
     };
 
     const renderLoading = () => (
-        <View style={styles.centerContainer}>
-            <Image source={SWORD_IMAGE} style={styles.placeholderImage} resizeMode="contain" />
-            <Text style={[theme.typography.body, { color: theme.text, marginTop: 20 }]}>{t.loading}</Text>
-        </View>
+        <TaskListSkeleton />
     );
 
     const renderEmpty = () => (
@@ -343,18 +300,7 @@ const TaskListScreen = () => {
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-            {showConfetti && (
-                <View style={StyleSheet.absoluteFill} pointerEvents="none">
-                    {[...Array(50)].map((_, i) => (
-                        <ConfettiParticle key={i} delay={Math.random() * 1000} startX={Math.random() * width} />
-                    ))}
-                    <View style={[styles.centerContainer, { paddingTop: 100 }]}>
-                        <Text style={[theme.typography.h1, { color: 'gold', fontSize: 40, textShadowRadius: 10, textShadowColor: 'black' }]}>
-                            ALL CLEAR!
-                        </Text>
-                    </View>
-                </View>
-            )}
+
 
             <View style={styles.header}>
                 <Text style={[styles.headerTitle, theme.typography.h1, { color: theme.textLight }]}>{t.tasksTitle}</Text>
@@ -386,7 +332,7 @@ const TaskListScreen = () => {
                     data={filteredTasks}
                     keyExtractor={(item) => item?._id || Math.random().toString()}
                     renderItem={renderTask}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={[styles.listContent, { paddingBottom: 90 }]}
                     ListEmptyComponent={renderEmpty}
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.text} />
