@@ -13,11 +13,15 @@
         "esModuleInterop": true,
         "jsx": "react-native",
         "useUnknownInCatchVariables": false,
-        "allowJs": true
+        "allowJs": true,
+        "skipLibCheck": true
     },
     "include": [
         "**/*.ts",
         "**/*.tsx",
         "**/*.d.ts"
+    ],
+    "exclude": [
+        "node_modules"
     ]
 }

@@ -1,87 +1,163 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, ReactNode, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authApi from '../api/authApi';
 
-const AuthContext = createContext<any>({});
+// Type definitions
+interface User {
+    id: string;
+    username: string;
+    email?: string;
+    class: string;
+    avatar: string;
+    focusAreas?: string[];
+    xp: number;
+    level: number;
+    gold: number;
+    tetranuta?: number;
+    stamina: number;
+    stats: {
+        strength: number;
+        intelligence: number;
+        vitality: number;
+        dexterity: number;
+        luck: number;
+    };
+    combat: {
+        currentHP: number;
+        maxHP: number;
+        currentMana?: number;
+        maxMana?: number;
+        wins: number;
+        losses: number;
+    };
+    skillPoints: number;
+    weeklyTasksCompleted: number;
+    taskHistory?: any[];
+    // Removed inventory from User type - now managed separately
+    completedQuests: string[];
+}
 
-export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+interface AuthContextType {
+    user: User | null;
+    isLoading: boolean;
+    login: (emailOrUsername: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    register: (username: string, email: string, password: string, userClass: string, avatar: string, focusAreas: string[]) => Promise<{ success: boolean; error?: string }>;
+    logout: () => Promise<void>;
+    updateUser: (updatedUserData: Partial<User>) => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Load user on app startup
     useEffect(() => {
         const loadUser = async () => {
             try {
-                // Safety timeout
-                const timeoutPromise = new Promise((_, reject) =>
+                // Safety timeout to prevent hang
+                const timeoutPromise = new Promise<void>((_, reject) =>
                     setTimeout(() => reject(new Error('Auth load timeout')), 5000)
                 );
 
                 const loadPromise = async () => {
-                    // console.log('[AuthProvider] Checking AsyncStorage...');
-                    // const token = await AsyncStorage.getItem('token');
-                    // const userData = await AsyncStorage.getItem('user');
-                    // console.log('[AuthProvider] Token:', !!token, 'UserData:', !!userData);
-                    // if (token && userData) {
-                    //     setUser(JSON.parse(userData));
-                    // }
-
-                    // Force User to null to ensure Login Screen appears first
-                    setUser(null);
+                    // In development, restore stored user for better hot reloading experience
+                    const token = await AsyncStorage.getItem('token');
+                    const userData = await AsyncStorage.getItem('user');
+                    if (token && userData) {
+                        console.log('[Auth] 🔄 Hot reload: Restoring user session');
+                        setUser(JSON.parse(userData));
+                    } else {
+                        console.log('[Auth] 🆕 Fresh start: No stored session');
+                        // For security, force fresh login on app startup
+                        setUser(null);
+                    }
                 };
 
                 await Promise.race([loadPromise(), timeoutPromise]);
             } catch (e) {
-                console.error('AuthProvider: Failed to load user', e);
+                console.error('[AuthProvider] Failed to load user:', e);
+                setUser(null);
             } finally {
                 setIsLoading(false);
             }
         };
+
         loadUser();
     }, []);
 
-    const login = async (emailOrUsername, password) => {
+    const login = useCallback(async (emailOrUsername: string, password: string) => {
         try {
             const data = await authApi.login(emailOrUsername, password);
             await AsyncStorage.setItem('token', data.token);
             await AsyncStorage.setItem('user', JSON.stringify(data.user));
             setUser(data.user);
             return { success: true };
-        } catch (error) {
-            return { success: false, error: error.response?.data?.message || 'Login failed' };
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+            console.error('[Auth] Login error:', errorMessage);
+            return { success: false, error: errorMessage };
         }
-    };
+    }, []);
 
-    const register = async (username, email, password, userClass, avatar, focusAreas) => {
+    const register = useCallback(async (username: string, email: string, password: string, userClass: string, avatar: string, focusAreas: string[]) => {
         try {
             const data = await authApi.register(username, email, password, userClass, avatar, focusAreas);
             await AsyncStorage.setItem('token', data.token);
             await AsyncStorage.setItem('user', JSON.stringify(data.user));
             setUser(data.user);
             return { success: true };
-        } catch (error) {
-            return { success: false, error: error.response?.data?.message || 'Registration failed' };
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+            console.error('[Auth] Registration error:', errorMessage);
+            return { success: false, error: errorMessage };
         }
-    };
+    }, []);
 
-    const logout = async () => {
-        await AsyncStorage.removeItem('token');
-        await AsyncStorage.removeItem('user');
-        setUser(null);
-    };
+    const logout = useCallback(async () => {
+        try {
+            await AsyncStorage.removeItem('token');
+            await AsyncStorage.removeItem('user');
+            setUser(null);
+        } catch (error) {
+            console.error('[Auth] Logout error:', error);
+            setUser(null);
+        }
+    }, []);
 
-    const updateUser = async (updatedUserData: any) => {
-        // Merge new data with existing user data to preserve fields not returned by backend
-        // This prevents losing avatar, username, class, email, etc. when backend returns partial data
-        const mergedUser = user ? { ...(user as object), ...updatedUserData } : updatedUserData;
-        await AsyncStorage.setItem('user', JSON.stringify(mergedUser));
-        setUser(mergedUser);
-    };
+    const updateUser = useCallback(async (updatedUserData: Partial<User>) => {
+        try {
+            // Merge new data with existing user data to preserve fields not returned by backend
+            // This prevents losing avatar, username, class, email, etc. when backend returns partial data
+            const mergedUser = user ? { ...(user as object), ...updatedUserData } : (updatedUserData as User);
+            await AsyncStorage.setItem('user', JSON.stringify(mergedUser));
+            setUser(mergedUser as User);
+        } catch (error) {
+            console.error('[Auth] Update user error:', error);
+        }
+    }, [user]);
+
+    const value = useMemo<AuthContextType>(() => ({
+        user,
+        isLoading,
+        login,
+        register,
+        logout,
+        updateUser
+    }), [user, isLoading, login, register, logout, updateUser]);
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateUser }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within AuthProvider');
+    }
+    return context;
+};

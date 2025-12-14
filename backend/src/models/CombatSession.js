@@ -40,4 +40,9 @@ const CombatSessionSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now, expires: 3600 } // Auto-delete after 1 hour
 });
 
+// Índices para optimizar queries
+CombatSessionSchema.index({ userId: 1, status: 1 }); // Para encontrar combate activo del usuario
+CombatSessionSchema.index({ userId: 1, dungeonId: 1, status: 1 }); // Para mazmorra activa
+
 module.exports = mongoose.model('CombatSession', CombatSessionSchema);
+

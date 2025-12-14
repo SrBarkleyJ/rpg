@@ -2,10 +2,12 @@ const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+const connectDB = require('../config/db');
+const { disconnectDB } = require('../config/db');
 
 const seedTasks = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await connectDB(process.env.MONGO_URI);
         console.log('Connected to DB for seeding tasks...');
 
         await Task.deleteMany({});
@@ -115,9 +117,11 @@ const seedTasks = async () => {
 
         await Task.insertMany(tasks);
         console.log('Tasks seeded successfully');
-        process.exit();
+        await disconnectDB();
+        process.exit(0);
     } catch (err) {
         console.error(err);
+        try { await disconnectDB(); } catch (e) {}
         process.exit(1);
     }
 };

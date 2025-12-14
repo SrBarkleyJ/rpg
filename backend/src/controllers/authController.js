@@ -67,7 +67,10 @@ const register = async (req, res, next) => {
         skillPoints: user.skillPoints,
         weeklyTasksCompleted: user.weeklyTasksCompleted,
         inventory: user.inventory,
-        completedQuests: user.completedQuests
+        completedQuests: user.completedQuests,
+        equipment: user.equipment,
+        equipmentBonuses: user.equipmentBonuses,
+        equipmentBonusesExtra: user.equipmentBonusesExtra
       }
     });
   } catch (err) {
@@ -107,7 +110,10 @@ const login = async (req, res, next) => {
         skillPoints: user.skillPoints,
         weeklyTasksCompleted: user.weeklyTasksCompleted,
         inventory: user.inventory,
-        completedQuests: user.completedQuests
+        completedQuests: user.completedQuests,
+        equipment: user.equipment,
+        equipmentBonuses: user.equipmentBonuses,
+        equipmentBonusesExtra: user.equipmentBonusesExtra
       }
     });
   } catch (err) {

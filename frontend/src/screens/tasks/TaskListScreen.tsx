@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, RefreshControl, Image, Animated, Dimensions, Easing } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, RefreshControl, Image, Dimensions } from 'react-native';
 import Reanimated, { Layout } from 'react-native-reanimated';
 import { useFocusEffect } from '@react-navigation/native';
 import taskApi from '../../api/taskApi';
@@ -12,7 +12,6 @@ import { hapticSuccess } from '../../utils/haptics';
 import AnimatedPressable from '../../components/UI/AnimatedPressable';
 import TaskListSkeleton from '../../components/skeletons/TaskListSkeleton';
 
-
 // Image import
 import swordImage from '../../../assets/images/sword_basic.jpg';
 
@@ -23,8 +22,8 @@ const { width, height } = Dimensions.get('window');
 
 interface Task {
     _id: string;
-    title: string | { en: string; es: string;[key: string]: any };
-    description?: string | { en: string; es: string;[key: string]: any };
+    title: string | { en: string; es: string; [key: string]: any };
+    description?: string | { en: string; es: string; [key: string]: any };
     repeatType: 'daily' | 'weekly' | 'once';
     difficulty: number;
     rewardXP: number;
@@ -33,18 +32,35 @@ interface Task {
     type: 'system' | 'user';
 }
 
-
+interface TaskStatus {
+    status: 'available' | 'cooldown' | 'completed';
+    timeRemaining?: string;
+}
 
 const TaskListScreen = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
-    const [showConfetti, setShowConfetti] = useState(false);
 
     const { user, updateUser } = useAuth();
     const { theme } = useTheme();
     const { t, language } = useLanguage();
+
+    const checkDailyCompletion = useCallback((currentTasks: Task[]) => {
+        if (!user || !user.taskHistory) return;
+
+        const dailyTasks = currentTasks.filter(t => t.repeatType === 'daily');
+        if (dailyTasks.length === 0) return;
+
+        const completedDailyCount = dailyTasks.filter(task => {
+            const status = getTaskStatus(task, user);
+            return status.status === 'cooldown';
+        }).length;
+        
+        // Aquí puedes añadir lógica adicional si es necesario
+        console.log(`Daily tasks completed: ${completedDailyCount}/${dailyTasks.length}`);
+    }, [user]);
 
     const loadTasks = async () => {
         try {
@@ -52,83 +68,61 @@ const TaskListScreen = () => {
             setTasks(data);
             checkDailyCompletion(data);
         } catch (error) {
-            console.error(error);
-            Alert.alert(t.error, t.failedToLoadTasks);
+            console.error('Error loading tasks:', error);
+            Alert.alert(t.error, t.failedToLoadTasks || 'Failed to load tasks');
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
     };
 
+    useEffect(() => {
+        loadTasks();
+    }, []);
+
     useFocusEffect(
         useCallback(() => {
-            loadTasks();
-            return () => { setShowConfetti(false); }; // Cleanup confetti on leave
-        }, [])
+            if (!refreshing) {
+                loadTasks();
+            }
+        }, [refreshing])
     );
-
-    const checkDailyCompletion = (currentTasks) => {
-        if (!user || !user.taskHistory) return;
-
-        const dailyTasks = currentTasks.filter(t => t.repeatType === 'daily');
-        if (dailyTasks.length === 0) return;
-
-        const completedDailyCount = dailyTasks.filter(task => {
-            const status = getTaskStatus(task, user); // Pass user explicitly to avoid stale closure if needed, though 'user' from hook should be fine
-            return status.status === 'cooldown';
-        }).length;
-
-        if (completedDailyCount === dailyTasks.length && dailyTasks.length > 0) {
-            setShowConfetti(true);
-            // Hide confetti after 8 seconds
-            setTimeout(() => setShowConfetti(false), 8000);
-        }
-    };
 
     const onRefresh = () => {
         setRefreshing(true);
         loadTasks();
     };
 
-    const handleCompleteTask = async (taskId) => {
+    const handleCompleteTask = async (taskId: string) => {
         try {
             const result = await taskApi.completeTask(taskId);
 
             let updatedUser = user;
             if (result.user) {
                 await updateUser(result.user);
-                updatedUser = result.user; // Update local reference for check
+                updatedUser = result.user;
             }
 
-            hapticSuccess(); // Trigger haptic success
+            hapticSuccess();
 
-            let message = `${t.completed}💰 +${result.goldGained} ${t.gold}⭐+${result.xpGained} ${t.xp}`;
+            let message = `${t.completed || 'Completed'}💰 +${result.goldGained} ${t.gold || 'Gold'}⭐+${result.xpGained} ${t.xp || 'XP'}`;
 
             if (result.leveledUp) {
-                message += `LEVEL UP! ${t.level} ${result.newLevel}!`;
+                message += ` LEVEL UP! ${t.level || 'Level'} ${result.newLevel}!`;
             }
 
             if (result.skillPointsAvailable && result.skillPointsAvailable > 0) {
-                message += `✨ ${result.skillPointsAvailable} ${t.skillPoints} available!`;
+                message += ` ✨ ${result.skillPointsAvailable} ${t.skillPoints || 'Skill Points'} available!`;
             }
 
-            Alert.alert(t.success, message);
+            Alert.alert(t.success || 'Success', message);
 
-            // Reload tasks and check completion
             const data = await taskApi.getTasks();
             setTasks(data);
 
-            // Re-check completion with new data and updated user
-            // We need to simulate the 'getTaskStatus' check with the NEW user data
-            // But since 'user' in state might not be updated instantly in this closure, 
-            // we should rely on the fresh data fetch or wait for effect.
-            // For now, reloadTasks handles it.
-
-            // Check daily completion specifically logic:
-            // We need to check against the freshly fetched tasks and the RESULT user (which has new history)
+            // Check daily completion
             const dailyTasks = data.filter(t => t.repeatType === 'daily');
             const completedCount = dailyTasks.filter(task => {
-                // Determine status manually here using updatedUser
                 if (!updatedUser || !updatedUser.taskHistory) return false;
                 const history = updatedUser.taskHistory.filter(h => h.taskId === task._id);
                 history.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
@@ -139,40 +133,33 @@ const TaskListScreen = () => {
                 return lastDate.toDateString() === now.toDateString();
             }).length;
 
-            if (dailyTasks.length > 0 && completedCount === dailyTasks.length) {
-                setShowConfetti(true);
-                setTimeout(() => setShowConfetti(false), 8000);
-            }
+            console.log(`Daily tasks completed: ${completedCount}/${dailyTasks.length}`);
 
-        } catch (error) {
+        } catch (error: any) {
             console.error('Task completion error:', error);
-            Alert.alert(t.error, error.response?.data?.message || t.failedToComplete);
+            Alert.alert(t.error || 'Error', error.response?.data?.message || t.failedToComplete || 'Failed to complete task');
         }
     };
 
-    const getDifficultyLabel = (difficulty) => {
-        if (typeof difficulty === 'number') {
-            if (difficulty <= 1) return 'easy';
-            if (difficulty === 2) return 'medium';
-            return 'hard';
-        }
-        return difficulty || 'easy';
+    const getDifficultyLabel = (difficulty: number): string => {
+        if (difficulty <= 1) return 'easy';
+        if (difficulty === 2) return 'medium';
+        return 'hard';
     };
 
-    const getDifficultyColor = (difficulty) => {
+    const getDifficultyColor = (difficulty: number): string => {
         const label = getDifficultyLabel(difficulty);
         switch (label) {
-            case 'easy': return theme.success;
-            case 'medium': return theme.warning;
-            case 'hard': return theme.danger;
-            default: return theme.text;
+            case 'easy': return theme.success || '#4CAF50';
+            case 'medium': return theme.warning || '#FF9800';
+            case 'hard': return theme.danger || '#F44336';
+            default: return theme.text || '#000000';
         }
     };
 
-    const getTaskStatus = (task, currentUser = user) => {
+    const getTaskStatus = (task: Task, currentUser = user): TaskStatus => {
         if (!currentUser || !currentUser.taskHistory) return { status: 'available' };
 
-        // Find history for this task
         const history = currentUser.taskHistory.filter(h => h.taskId === task._id);
         history.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
         const lastCompletion = history[0];
@@ -187,7 +174,6 @@ const TaskListScreen = () => {
             const now = new Date();
 
             if (lastDate.toDateString() === now.toDateString()) {
-                // Calculate hours remaining
                 const tomorrow = new Date(now);
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 tomorrow.setHours(0, 0, 0, 0);
@@ -209,7 +195,7 @@ const TaskListScreen = () => {
         return { status: 'available' };
     };
 
-    const renderTask = ({ item }) => {
+    const renderTask = ({ item }: { item: Task }) => {
         try {
             if (!item) return null;
 
@@ -218,7 +204,6 @@ const TaskListScreen = () => {
             const isCooldown = status === 'cooldown';
             const isDisabled = isCompleted || isCooldown;
 
-            // Handle title translation safely
             let title = 'Untitled Task';
             if (item.title) {
                 title = typeof item.title === 'object' ? (item.title[language] || item.title.en || 'Untitled') : item.title;
@@ -237,7 +222,6 @@ const TaskListScreen = () => {
                         <View style={styles.taskHeader}>
                             <View style={styles.titleContainer}>
                                 <Text style={[styles.taskTitle, theme.typography.h3, { color: theme.text }]}>{title}</Text>
-                                {/* Removed Badge from here as it's redundant with tabs */}
                             </View>
                             <View style={[styles.difficultyBadge, { borderColor: getDifficultyColor(item.difficulty) }]}>
                                 <Text style={[styles.difficultyText, theme.typography.small, { color: getDifficultyColor(item.difficulty) }]}>
@@ -246,14 +230,15 @@ const TaskListScreen = () => {
                             </View>
                         </View>
 
-                        {description && (
+                        {description ? (
                             <Text style={[styles.taskDescription, theme.typography.body, { color: theme.text }]}>{description}</Text>
-                        )}
+                        ) : null}
 
                         <View style={styles.rewardsContainer}>
-                            <Text style={[styles.rewardText, theme.typography.bodyBold, { color: theme.text }]}>{t.reward}: </Text>
-                            <Text style={[styles.xpText, theme.typography.bodyBold, { color: theme.secondary }]}>{item.rewardXP} {t.xp}</Text>
-                            <Text style={[styles.goldText, theme.typography.bodyBold, { color: theme.warning }]}> | {item.rewardGold} {t.gold}</Text>
+                            <Text style={[styles.rewardText, theme.typography.bodyBold, { color: theme.text }]}>{t.reward || 'Reward'}: </Text>
+                            <Text style={[styles.xpText, theme.typography.bodyBold, { color: theme.secondary }]}>{item.rewardXP} {t.xp || 'XP'}</Text>
+                            <Text style={[styles.goldText, theme.typography.bodyBold, { color: theme.warning }]}>{item.rewardGold} {t.gold || 'Gold'}</Text>
+                        
                         </View>
 
                         <AnimatedPressable
@@ -269,7 +254,7 @@ const TaskListScreen = () => {
                             disabled={isDisabled}
                         >
                             <Text style={[styles.buttonText, theme.typography.h3, { color: theme.textLight }]}>
-                                {isCooldown ? `⏳ ${timeRemaining}` : (isCompleted ? t.completed : t.complete)}
+                                {isCooldown ? `⏳ ${timeRemaining}` : (isCompleted ? t.completed || 'Completed' : t.complete || 'Complete')}
                             </Text>
                         </AnimatedPressable>
                     </PixelCard>
@@ -288,7 +273,7 @@ const TaskListScreen = () => {
     const renderEmpty = () => (
         <View style={styles.centerContainer}>
             <Image source={SWORD_IMAGE} style={styles.placeholderImage} resizeMode="contain" />
-            <Text style={[theme.typography.body, { color: theme.text, marginTop: 20 }]}>{t.noTasksAvailable}</Text>
+            <Text style={[theme.typography.body, { color: theme.text, marginTop: 20 }]}>{t.noTasksAvailable || 'No tasks available'}</Text>
         </View>
     );
 
@@ -300,10 +285,8 @@ const TaskListScreen = () => {
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-
-
             <View style={styles.header}>
-                <Text style={[styles.headerTitle, theme.typography.h1, { color: theme.textLight }]}>{t.tasksTitle}</Text>
+                <Text style={[styles.headerTitle, theme.typography.h1, { color: theme.textLight }]}>{t.tasksTitle || 'Tasks'}</Text>
             </View>
 
             <View style={styles.tabContainer}>
@@ -312,7 +295,7 @@ const TaskListScreen = () => {
                     onPress={() => setActiveTab('daily')}
                 >
                     <Text style={[styles.tabText, activeTab === 'daily' ? { color: theme.textLight } : { color: theme.text }]}>
-                        {t.daily}
+                        {t.daily || 'Daily'}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -320,7 +303,7 @@ const TaskListScreen = () => {
                     onPress={() => setActiveTab('weekly')}
                 >
                     <Text style={[styles.tabText, activeTab === 'weekly' ? { color: theme.textLight } : { color: theme.text }]}>
-                        {t.weekly}
+                        {t.weekly || 'Weekly'}
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -408,16 +391,6 @@ const styles = StyleSheet.create({
     taskTitle: {
         marginBottom: 8,
     },
-    badge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 4,
-        alignSelf: 'flex-start',
-        marginTop: 4,
-    },
-    badgeText: {
-        color: 'white',
-    },
     difficultyBadge: {
         borderWidth: 2,
         paddingHorizontal: 8,
@@ -425,6 +398,7 @@ const styles = StyleSheet.create({
         borderRadius: 4,
     },
     difficultyText: {
+        // Styling is handled by theme
     },
     taskDescription: {
         marginTop: 9,
@@ -432,15 +406,18 @@ const styles = StyleSheet.create({
         lineHeight: 23,
     },
     rewardsContainer: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         alignItems: 'center',
         marginBottom: spacing.md,
     },
     rewardText: {
+        // Styling is handled by theme
     },
     xpText: {
+        // Styling is handled by theme
     },
     goldText: {
+        // Styling is handled by theme
     },
     completeButton: {
         paddingVertical: 12,
@@ -453,6 +430,7 @@ const styles = StyleSheet.create({
         opacity: 0.6,
     },
     buttonText: {
+        // Styling is handled by theme
     },
 });
 

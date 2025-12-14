@@ -23,7 +23,7 @@ interface PlayerAvatarProps {
 
 const PlayerAvatar = memo(({ 
     avatarKey, 
-    size = 121, 
+    size = 150, 
     animated = false, 
     style 
 }: PlayerAvatarProps) => {

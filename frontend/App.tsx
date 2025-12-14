@@ -3,6 +3,7 @@ import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import { AuthProvider } from './src/hooks/useAuth';
+import { InventoryProvider } from './src/hooks/useInventory';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { LanguageProvider } from './src/context/LanguageContext';
 import { useAuth } from './src/hooks/useAuth';
@@ -18,7 +19,7 @@ import { View, Text, StyleSheet } from 'react-native';
 SplashScreen.preventAutoHideAsync();
 
 const AppContent = () => {
-    const { token } = useAuth();
+    const { user } = useAuth();
     return <AppNavigator />;
 };
 
@@ -79,7 +80,9 @@ export default function App() {
             <LanguageProvider>
                 <ThemeProvider>
                     <AuthProvider>
-                        <AppContent />
+                        <InventoryProvider>
+                            <AppContent />
+                        </InventoryProvider>
                     </AuthProvider>
                 </ThemeProvider>
             </LanguageProvider>

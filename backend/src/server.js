@@ -6,9 +6,11 @@ const morgan = require('morgan');
 const path = require('path');
 const rateLimit = require('./middleware/rateLimit');
 const connectDB = require('./config/db');
+const logger = require('./config/logger');
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const rewardRoutes = require('./routes/rewardRoutes');
+const inventoryRoutes = require('./routes/inventoryRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const combatRoutes = require('./routes/combatRoutes');
@@ -35,6 +37,7 @@ app.use(rateLimit);
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/rewards', rewardRoutes);
+app.use('/api/inventory', inventoryRoutes);
 app.use('/api/user', progressRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/combat', combatRoutes);
@@ -47,5 +50,9 @@ app.get('/', (req, res) => res.send({ status: 'ok', env: process.env.NODE_ENV })
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT} and accessible via LAN`));
+app.listen(PORT, '0.0.0.0', () => {
+  const message = `Server running on port ${PORT} and accessible via LAN`;
+  logger.info(message);
+  console.log(`✅ ${message}`);
+});
 

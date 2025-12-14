@@ -9,6 +9,7 @@
         "seed:users": "node src/seed/seedUsers.js",
         "seed:rewards": "node src/seed/seedRewards.js",
         "seed:tasks": "node src/seed/seedTasks.js",
+        "seed:all": "npm run seed:users && npm run seed:rewards && npm run seed:tasks",
         "seed:combat": "node seeds/index.js",
         "notify:daily": "node src/utils/notifyUsers.js daily",
         "notify:weekly": "node src/utils/notifyUsers.js weekly",

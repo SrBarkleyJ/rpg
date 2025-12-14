@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image, ImageSourcePropType } from 'react-native';
 import skillApi from '../../api/skillApi';
 import { useAuth } from '../../hooks/useAuth';
@@ -54,7 +54,7 @@ const SkillsScreen = () => {
             setAvailableSP(response.data.availableSP);
         } catch (error) {
             console.error(error);
-            Alert.alert(t.error, 'Failed to load skills');
+            Alert.alert(t.error, t.failedToLoadSkills);
         } finally {
             setLoading(false);
         }
@@ -70,7 +70,7 @@ const SkillsScreen = () => {
             }
         } catch (error: any) {
             console.error(error);
-            Alert.alert(t.error, error.response?.data?.message || 'Failed to upgrade skill');
+            Alert.alert(t.error, error.response?.data?.message || t.failedToUpgradeSkill);
         }
     };
 
@@ -276,4 +276,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SkillsScreen;
+export default memo(SkillsScreen);

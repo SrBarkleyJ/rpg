@@ -10,13 +10,14 @@ const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
     const { user, isLoading } = useAuth();
-    // console.log('[AppNavigator] isLoading:', isLoading, 'User:', user ? 'Logged In' : 'No Session');
+    console.log('[AppNavigator] isLoading:', isLoading, 'User:', user ? '✅ Logged In' : '❌ No Session');
 
     if (isLoading) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
                 <ActivityIndicator size="large" color="#8b4513" />
-                <Text>Loading RPG...</Text>
+                <Text style={{ color: '#fff', marginTop: 10 }}>Loading RPG...</Text>
+                <Text style={{ color: '#888', marginTop: 5, fontSize: 12 }}>Hot Reload Active</Text>
             </View>
         );
     }

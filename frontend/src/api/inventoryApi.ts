@@ -1,10 +1,15 @@
 import apiClient from './apiClient';
 
-const inventoryApi = {
-    getInventory: () => apiClient.get('/rewards/inventory'),
-    equipItem: (itemId: string) => apiClient.post('/rewards/equip', { itemId }),
-    unequipItem: (itemId: string) => apiClient.post('/rewards/unequip', { itemId }),
-    useItem: (itemId: string) => apiClient.post('/rewards/use', { itemId }),
-};
+export default {
+    getInventory: () =>
+        apiClient.get('/inventory'),
 
-export default inventoryApi;
+    equipItem: (data) =>
+        apiClient.post('/inventory/equip', data),
+
+    unequipItem: (data) =>
+        apiClient.post('/inventory/unequip', data),
+
+    useItem: (itemId) =>
+        apiClient.post('/inventory/use', { itemId })
+};

@@ -1,8 +1,19 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, Image, Dimensions } from 'react-native';
+import React, { useState, useCallback, useMemo, memo } from 'react';
+import {
+    View,
+    Text,
+    FlatList,
+    StyleSheet,
+    Alert,
+    TouchableOpacity,
+    Image,
+    Dimensions,
+    ActivityIndicator
+} from 'react-native';
 import rewardApi from '../../api/rewardApi';
 import { useAuth } from '../../hooks/useAuth';
+import { useInventory } from '../../hooks/useInventory';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { spacing } from '../../theme/spacing';
@@ -11,136 +22,302 @@ import { getItemImage } from '../../config/itemImages';
 import { hapticSuccess } from '../../utils/haptics';
 import AnimatedPressable from '../../components/UI/AnimatedPressable';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const ITEM_WIDTH = (SCREEN_WIDTH - spacing.md * 2 - spacing.sm) / 2;
+
 const ShopScreen = () => {
-    const [items, setItems] = useState<any[]>([]);
+    const [allItems, setAllItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [category, setCategory] = useState('All');
     const { user, updateUser } = useAuth();
+    const { loadInventory } = useInventory();
     const { theme } = useTheme();
     const { t, translateItem } = useLanguage();
 
     const categories = [
-        { id: 'All', label: t.cat_all },
-        { id: 'Consumable', label: t.cat_consumable },
-        { id: 'Warrior', label: t.cat_warrior },
-        { id: 'Mage', label: t.cat_mage },
-        { id: 'Rogue', label: t.cat_rogue },
-        { id: 'Armor', label: t.cat_armor },
-        { id: 'Accessory', label: t.cat_accessory }
+        { id: 'All', label: t.cat_all || 'All' },
+        { id: 'Consumable', label: t.cat_consumable || 'Consumables' },
+        { id: 'Weapon', label: t.cat_weapon || 'Weapons' },
+        { id: 'Armor', label: t.cat_armor || 'Armor' },
+        { id: 'Accessory', label: t.cat_accessory || 'Accessories' },
     ];
 
     useFocusEffect(
         useCallback(() => {
             loadItems();
-            // refreshUser(); // Removed as it is not available in useAuth
         }, [])
     );
 
     const loadItems = async () => {
         try {
+            setLoading(true);
             const data = await rewardApi.getRewards();
-            setItems(data);
+            console.log('Total items loaded:', data.length);
+            console.log('Item types:', [...new Set(data.map(item => item.type))]);
+            console.log('Item classes:', [...new Set(data.flatMap(item => item.allowedClasses))]);
+
+            // Filtrar solo items que se pueden comprar
+            const shopItems = data.filter(item => {
+                const isShopItem = item.obtainableInShop !== false; // true o undefined
+                const hasCost = item.cost > 0;
+                return isShopItem && hasCost;
+            });
+
+            console.log('Shop items after filter:', shopItems.length);
+            setAllItems(shopItems);
         } catch (error) {
-            console.error(error);
-            Alert.alert(t.error, t.failedToLoadShop);
+            console.error('Error loading shop items:', error);
+            Alert.alert(t.error || 'Error', t.failedToLoadShop || 'Failed to load shop');
         } finally {
             setLoading(false);
         }
     };
 
+    // Función mejorada de filtrado
+    const getFilteredItems = useMemo(() => {
+        if (!allItems.length) return [];
+
+        console.log(`Filtering items by category: ${category}`);
+
+        return allItems.filter(item => {
+            if (!item) return false;
+
+            switch (category) {
+                case 'All':
+                    return true;
+
+                case 'Consumable':
+                    return item.type === 'consumable';
+
+                case 'Weapon':
+                    return item.type === 'weapon';
+
+                case 'Armor':
+                    return item.type === 'armor' || item.type === 'shield';
+
+                case 'Accessory':
+                    return item.type === 'accessory';
+
+                case 'Warrior':
+                    // Incluye items para warriors o items universales
+                    return item.allowedClasses?.includes('warrior') ||
+                        item.allowedClasses?.includes('all') ||
+                        (item.allowedClasses?.length === 1 && item.allowedClasses[0] === 'warrior');
+
+                case 'Mage':
+                    return item.allowedClasses?.includes('mage') ||
+                        item.allowedClasses?.includes('all') ||
+                        (item.allowedClasses?.length === 1 && item.allowedClasses[0] === 'mage');
+
+                case 'Rogue':
+                    return item.allowedClasses?.includes('rogue') ||
+                        item.allowedClasses?.includes('all') ||
+                        (item.allowedClasses?.length === 1 && item.allowedClasses[0] === 'rogue');
+
+                default:
+                    return true;
+            }
+        });
+    }, [allItems, category]);
+
     const handleBuyItem = async (item) => {
-        if (user.gold < item.cost) {
-            Alert.alert(t.error, t.notEnoughGold);
+        if (!user || user.gold < item.cost) {
+            Alert.alert(t.error || 'Error', t.notEnoughGold || 'Not enough gold');
             return;
         }
 
         try {
             const result = await rewardApi.buyReward(item._id);
-            if (result.user) {
-                await updateUser(result.user);
+            if (result.data?.user) {
+                // IMPORTANT: The API returns { success: true, data: { user: ... } }
+                await updateUser(result.data.user);
+
                 hapticSuccess();
-                Alert.alert(t.success, `${t.buySuccess} ${translateItem(item.name)}!`);
+                Alert.alert(
+                    t.success || 'Success',
+                    `${t.buySuccess || 'Purchased'} ${translateItem(item.name)}!`
+                );
+                // Don't just reload items, also ensure local user state reflects changes immediately if updateUser is async
+                loadItems();
+                loadInventory();
             }
-        } catch (error) {
-            console.error(error);
-            Alert.alert(t.error, t.failedToPurchase);
+        } catch (error: any) {
+            console.error('Purchase error:', error);
+            Alert.alert(
+                t.error || 'Error',
+                error.response?.data?.message || t.failedToPurchase || 'Purchase failed'
+            );
         }
     };
 
     const getRarityColor = (rarity) => {
-        switch (rarity) {
+        switch (rarity?.toLowerCase()) {
             case 'common': return '#b0b0b0';
             case 'uncommon': return '#4caf50';
             case 'rare': return '#42a5f5';
             case 'epic': return '#ab47bc';
             case 'legendary': return '#ffa726';
-            default: return theme.text;
+            default: return theme.text || '#000000';
         }
     };
 
-    const getFilteredItems = () => {
-        return items.filter(item => {
-            if (category === 'All') return true;
-            if (category === 'Consumable') return item.type === 'consumable';
-            if (category === 'Warrior') return item.allowedClasses.includes('warrior');
-            if (category === 'Mage') return item.allowedClasses.includes('mage');
-            if (category === 'Rogue') return item.allowedClasses.includes('rogue');
-            if (category === 'Armor') return item.type === 'armor';
-            if (category === 'Accessory') return item.type === 'accessory';
-            return true;
-        });
-    };
-
-    const renderItem = ({ item }) => {
-        const name = translateItem(item.name);
+    const renderItemImage = (item) => {
         const itemImage = getItemImage(item.image);
 
+        if (itemImage) {
+            return (
+                <Image
+                    source={itemImage}
+                    style={styles.itemImage}
+                    resizeMode="contain"
+                />
+            );
+        }
+
+        const emoji = item.type === 'weapon' ? '⚔️' :
+            item.type === 'armor' ? '🛡️' :
+                item.type === 'accessory' ? '💍' :
+                    item.type === 'consumable' ? '🧪' :
+                        item.type === 'shield' ? '🛡️' : '❓';
+
         return (
-            <PixelCard style={[styles.itemCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-                <View style={[styles.imageContainer, { backgroundColor: '#00000040' }]}>
-                    {itemImage ? (
-                        <Image
-                            source={itemImage}
-                            style={styles.itemImage}
-                            resizeMode="contain"
-                        />
-                    ) : (
-                        <Text style={[styles.itemEmoji, theme.typography.h1]}>
-                            {item.type === 'weapon' ? '⚔️' :
-                                item.type === 'armor' ? '🛡️' :
-                                    item.type === 'accessory' ? '💍' :
-                                        '🧪'}
-                        </Text>
-                    )}
-                </View>
+            <Text style={styles.itemEmoji}>{emoji}</Text>
+        );
+    };
 
-                <View style={styles.textContainer}>
-                    <Text style={[styles.itemName, theme.typography.h3, { color: getRarityColor(item.rarity) }]}>{name}</Text>
-                    <Text style={[styles.itemType, theme.typography.small, { color: theme.text, opacity: 0.7 }]}>
-                        {t[item.type] || item.type} • {t[item.rarity] || item.rarity}
-                    </Text>
-                </View>
+    const renderItem = ({ item, index }) => {
+        if (!item) return null;
 
-                <View style={styles.priceContainer}>
-                    <Text style={[styles.priceText, theme.typography.bodyBold, { color: theme.warning }]}>{item.cost} {t.gold}</Text>
-                </View>
+        const name = translateItem(item.name);
+        const canAfford = (user?.gold || 0) >= item.cost;
 
-                <AnimatedPressable
-                    style={[styles.buyButton, { backgroundColor: theme.primary, borderColor: theme.border }]}
-                    onPress={() => handleBuyItem(item)}
+        return (
+            <View style={[
+                styles.itemContainer,
+                {
+                    marginLeft: index % 2 === 0 ? 0 : spacing.sm / 2,
+                    marginRight: index % 2 === 0 ? spacing.sm / 2 : 0
+                }
+            ]}>
+                <PixelCard
+                    style={[
+                        styles.itemCard,
+                        {
+                            borderColor: theme.border,
+                            backgroundColor: theme.surface
+                        }
+                    ]}
                 >
-                    <Text style={[styles.buyButtonText, theme.typography.bodyBold, { color: theme.textLight }]}>{t.buy}</Text>
-                </AnimatedPressable>
-            </PixelCard>
+                    <View style={styles.imageContainer}>
+                        {renderItemImage(item)}
+                    </View>
+
+                    <View style={styles.textContainer}>
+                        <Text
+                            style={[
+                                styles.itemName,
+                                {
+                                    color: getRarityColor(item.rarity),
+                                    fontSize: 14,
+                                    fontWeight: 'bold',
+                                    textAlign: 'center'
+                                }
+                            ]}
+                            numberOfLines={2}
+                        >
+                            {name}
+                        </Text>
+
+                        <Text
+                            style={[
+                                styles.itemType,
+                                {
+                                    color: theme.text,
+                                    opacity: 0.7,
+                                    fontSize: 11,
+                                    textAlign: 'center',
+                                    marginTop: 4
+                                }
+                            ]}
+                            numberOfLines={1}
+                        >
+                            {t[item.type] || item.type} • {t[item.rarity] || item.rarity}
+                        </Text>
+                    </View>
+
+                    <View style={styles.priceContainer}>
+                        <Text style={[
+                            styles.priceText,
+                            {
+                                color: canAfford ? theme.warning : theme.danger,
+                                opacity: canAfford ? 1 : 0.6,
+                                fontSize: 13,
+                                fontWeight: 'bold'
+                            }
+                        ]}>
+                            {item.cost} {t.gold || 'Gold'}
+                        </Text>
+                    </View>
+
+                    <AnimatedPressable
+                        style={[
+                            styles.buyButton,
+                            {
+                                backgroundColor: canAfford ? theme.primary : theme.border,
+                                borderColor: theme.border,
+                                opacity: canAfford ? 1 : 0.7
+                            }
+                        ]}
+                        onPress={() => canAfford && handleBuyItem(item)}
+                        disabled={!canAfford}
+                    >
+                        <Text style={[
+                            styles.buyButtonText,
+                            {
+                                color: theme.textLight,
+                                fontSize: 12,
+                                fontWeight: 'bold'
+                            }
+                        ]}>
+                            {canAfford ? (t.buy || 'Buy') : (t.cannotAfford || 'Too Expensive')}
+                        </Text>
+                    </AnimatedPressable>
+                </PixelCard>
+            </View>
         );
     };
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
             <View style={styles.header}>
-                <Text style={[styles.headerTitle, theme.typography.h1, { color: theme.textLight }]}>{t.shopTitle}</Text>
-                <View style={[styles.goldContainer, { backgroundColor: theme.surface, borderColor: theme.warning }]}>
-                    <Text style={[styles.goldText, theme.typography.h3, { color: theme.warning }]}>💰 {user?.gold || 0}</Text>
+                <Text style={[
+                    styles.headerTitle,
+                    {
+                        color: theme.textLight,
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        flex: 1
+                    }
+                ]}>
+                    {t.shopTitle || 'Shop'}
+                </Text>
+                <View style={[
+                    styles.goldContainer,
+                    {
+                        backgroundColor: theme.surface,
+                        borderColor: theme.warning
+                    }
+                ]}>
+                    <Text style={[
+                        {
+                            color: theme.warning,
+                            fontSize: 16,
+                            fontWeight: 'bold'
+                        }
+                    ]}>
+                        💰 {user?.gold || 0}
+                    </Text>
                 </View>
             </View>
 
@@ -150,36 +327,64 @@ const ShopScreen = () => {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
+                    renderItem={({ item: cat }) => (
                         <TouchableOpacity
                             style={[
                                 styles.filterButton,
-                                category === item.id && { backgroundColor: theme.primary, borderColor: theme.warning },
-                                { borderColor: theme.border }
+                                {
+                                    borderColor: theme.border,
+                                    backgroundColor: category === cat.id ? theme.primary : theme.surface
+                                }
                             ]}
-                            onPress={() => setCategory(item.id)}
+                            onPress={() => setCategory(cat.id)}
                         >
                             <Text style={[
-                                styles.filterText, theme.typography.bodyBold,
-                                category === item.id ? { color: theme.textLight } : { color: theme.textLight }
+                                {
+                                    color: category === cat.id ? theme.textLight : theme.text,
+                                    fontSize: 12,
+                                    fontWeight: 'bold'
+                                }
                             ]}>
-                                {item.label}
+                                {cat.label}
                             </Text>
                         </TouchableOpacity>
                     )}
+                    contentContainerStyle={styles.filterListContent}
                 />
             </View>
 
             {loading ? (
-                <Text style={[theme.typography.body, { color: theme.textLight, textAlign: 'center', marginTop: 20 }]}>{t.loading}</Text>
+                <View style={styles.centerContainer}>
+                    <ActivityIndicator size="large" color={theme.primary} />
+                    <Text style={{ color: theme.text, marginTop: 20 }}>
+                        {t.loading || 'Loading...'}
+                    </Text>
+                </View>
+            ) : getFilteredItems.length === 0 ? (
+                <View style={styles.centerContainer}>
+                    <Text style={{ color: theme.text, textAlign: 'center' }}>
+                        {t.noItemsAvailable || 'No items available'}
+                    </Text>
+                    <Text style={{ color: theme.text, opacity: 0.7, marginTop: 10 }}>
+                        Category: {category}
+                    </Text>
+                </View>
             ) : (
                 <FlatList
-                    data={getFilteredItems()}
+                    data={getFilteredItems}
                     keyExtractor={(item) => item._id}
-                    renderItem={renderItem}
+                    renderItem={({ item, index }) => renderItem({ item, index })}
                     numColumns={2}
                     contentContainerStyle={styles.listContent}
-                    columnWrapperStyle={styles.columnWrapper}
+                    showsVerticalScrollIndicator={false}
+                    ListHeaderComponent={() => (
+                        <Text style={[
+                            styles.categoryHeader,
+                            { color: theme.text, opacity: 0.8 }
+                        ]}>
+                            {categories.find(c => c.id === category)?.label || 'Items'} ({getFilteredItems.length})
+                        </Text>
+                    )}
                 />
             )}
         </View>
@@ -196,18 +401,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: spacing.md,
-        marginTop: spacing.md,
-        paddingHorizontal: spacing.sm,
     },
     headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        letterSpacing: 2,
+        letterSpacing: 1,
         textShadowColor: 'black',
-        textShadowOffset: { width: 2, height: 2 },
+        textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 1,
-        flex: 1,
-        textAlign: 'center',
     },
     goldContainer: {
         paddingHorizontal: 12,
@@ -215,13 +414,12 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 2,
     },
-    goldText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
     filterContainer: {
         marginBottom: spacing.md,
         height: 50,
+    },
+    filterListContent: {
+        paddingHorizontal: 4,
     },
     filterButton: {
         paddingHorizontal: 16,
@@ -229,83 +427,84 @@ const styles = StyleSheet.create({
         marginRight: 8,
         borderRadius: 20,
         borderWidth: 1,
-        backgroundColor: '#444',
         justifyContent: 'center',
+        minHeight: 40,
     },
-    filterText: {
-        fontSize: 14,
-        fontWeight: 'bold',
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-
     listContent: {
-        paddingBottom: 90,
+        paddingBottom: 100,
     },
-    columnWrapper: {
-        justifyContent: 'space-between',
+    categoryHeader: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: spacing.md,
+        textAlign: 'center',
+    },
+    itemContainer: {
+        width: ITEM_WIDTH,
+        marginBottom: spacing.md,
     },
     itemCard: {
-        width: (Dimensions.get('window').width / 2) - spacing.md - 4, // Calculate width: half screen minus padding
-        marginBottom: spacing.md,
+        width: '100%',
         padding: spacing.sm,
         alignItems: 'center',
         borderWidth: 2,
+        borderRadius: 8,
     },
     imageContainer: {
-        width: '100%',
-        height: Dimensions.get('window').width * 0.35, // Height is 35% of screen width (square-ish)
-        borderRadius: 8,
+        width: ITEM_WIDTH - spacing.sm * 2,
+        height: ITEM_WIDTH - spacing.sm * 2,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: spacing.sm,
-        backgroundColor: '#FFFFFF', // White background as requested
+        backgroundColor: '#FFFFFF',
+        borderRadius: 6,
+        overflow: 'hidden',
     },
     itemImage: {
-        width: '80%',    // Responsive to container
-        height: '80%',
+        width: '90%',
+        height: '90%',
     },
     itemEmoji: {
-        fontSize: Dimensions.get('window').width * 0.1, // Responsive font
+        fontSize: 32,
     },
     textContainer: {
         width: '100%',
+        minHeight: 60,
+        justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 4,
-        height: 70, // Fixed height for text area prevents alignment issues
-        justifyContent: 'flex-start'
+        marginBottom: spacing.sm,
     },
     itemName: {
-        fontSize: 14,
-        fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 4,
-        textShadowColor: 'rgba(0,0,0,0.5)',
+        textShadowColor: 'rgba(0,0,0,0.3)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 1,
     },
     itemType: {
-        fontSize: 10,
-        marginBottom: spacing.sm,
         textTransform: 'uppercase',
     },
     priceContainer: {
         marginBottom: spacing.sm,
+        paddingVertical: 4,
     },
     priceText: {
-        fontSize: 14,
-        fontWeight: 'bold',
+        textAlign: 'center',
     },
     buyButton: {
         width: '100%',
         paddingVertical: 8,
-        borderRadius: 4,
+        borderRadius: 6,
         alignItems: 'center',
         borderWidth: 2,
     },
     buyButtonText: {
-        fontSize: 12,
-        fontWeight: 'bold',
         textTransform: 'uppercase',
     },
 });
 
-export default ShopScreen;
+export default memo(ShopScreen);

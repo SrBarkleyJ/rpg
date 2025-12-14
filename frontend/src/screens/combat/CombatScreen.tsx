@@ -93,7 +93,7 @@ const CombatScreen = () => {
     const scrollViewRef = useRef<ScrollView>(null);
 
     // Usar el hook para la imagen del jugador
-    const { avatarKey } = usePlayerAvatar(user?.avatar);
+    const { avatarKey } = usePlayerAvatar(user?.avatar || 'img1');
 
     // Usar hook para animaciones
     const {
@@ -233,7 +233,7 @@ const CombatScreen = () => {
             }
         } catch (error: any) {
             console.error(error);
-            Alert.alert(t.error || 'Error', error.response?.data?.message || 'Failed to enter dungeon');
+            Alert.alert(t.error || 'Error', error.response?.data?.message || t.failedToEnterDungeon);
         } finally {
             setLoading(false);
         }
@@ -257,7 +257,7 @@ const CombatScreen = () => {
             }
         } catch (error: any) {
             console.error('❌ Continue dungeon error:', error);
-            Alert.alert(t.error || 'Error', error.response?.data?.message || 'Failed to continue dungeon');
+            Alert.alert(t.error || 'Error', error.response?.data?.message || t.failedToContinueDungeon);
         } finally {
             setLoading(false);
         }
@@ -276,7 +276,7 @@ const CombatScreen = () => {
             Alert.alert(t.success || 'Success', data.message);
         } catch (error: any) {
             console.error(error);
-            const msg = error.response?.data?.message || 'Failed to rest';
+            const msg = error.response?.data?.message || t.failedToRest;
             Alert.alert(t.rest || 'Rest', msg);
         } finally {
             setLoading(false);
@@ -538,7 +538,7 @@ const CombatScreen = () => {
             </View>
 
             {/* Content Container with Flex Layout */}
-            <View style={{ flex: 1, gap: spacing.sm }}>
+            <View style={{ flex: 1, gap: spacing.sm, marginTop: height * 0.01 }}>
 
                 {/* Dungeon Info - Takes small space if active */}
                 {activeCombat?.dungeonInfo && (
@@ -570,7 +570,7 @@ const CombatScreen = () => {
                 )}
 
                 {/* Combat Area - Main focus (approx 40%) */}
-                <View style={{ flex: 5, justifyContent: 'center' }}>
+                <View style={{ flex:3, justifyContent: 'center', paddingVertical: 2, backgroundColor: 'transparent' }}>
                     <CombatArea
                         user={user}
                         avatarKey={avatarKey}
@@ -600,19 +600,8 @@ const CombatScreen = () => {
                     />
                 </View>
 
-                {/* Turn Indicator - Small strip */}
-                {activeCombat && activeCombat.status === 'active' && (
-                    <View style={{ height: 30 }}>
-                        <View style={[styles.turnIndicator, { backgroundColor: playerTurn ? theme.success : theme.danger, flex: 1, padding: 0, justifyContent: 'center', marginBottom: 0 }]}>
-                            <Text style={[styles.turnText, { color: theme.textLight, fontSize: 14 }]}>
-                                {playerTurn ? `⚔️ ${t.yourTurn}` : `🛡️ ${t.enemyTurnLabel}`}
-                            </Text>
-                        </View>
-                    </View>
-                )}
-
                 {/* Stats - Consistent space */}
-                <View style={{ flex: 2, justifyContent: 'center' }}>
+                <View style={{ flex: 2, justifyContent: 'center', paddingTop:18 }}>
                     <CombatStats
                         user={user}
                         activeCombat={activeCombat}
@@ -621,8 +610,8 @@ const CombatScreen = () => {
                     />
                 </View>
 
-                {/* Action Buttons - Controls at bottom (approx 30%) */}
-                <View style={{ flex: 3 }}>
+                {/* Action Buttons */}
+                <View style={{ flex: 4 , paddingTop:18}}>
                     <ActionButtons
                         activeCombat={activeCombat}
                         playerTurn={playerTurn}

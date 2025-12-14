@@ -59,6 +59,7 @@ export const en = {
     buy: 'BUY',
     notEnoughGold: 'Not enough gold!',
     buySuccess: 'You bought',
+    failedToLoadShop: 'Failed to load shop',
 
     // Combat
     combatTitle: 'ARENA',
@@ -192,6 +193,8 @@ export const en = {
     // Skills
     skillsTitle: 'SKILLS',
     upgrade: 'UPGRADE',
+    failedToLoadSkills: 'Failed to load skills',
+    failedToUpgradeSkill: 'Failed to upgrade skill',
 
     // Unified Skills
     'Heroic Strike': 'Heroic Strike',

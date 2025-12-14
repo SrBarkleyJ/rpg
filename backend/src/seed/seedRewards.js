@@ -2,11 +2,15 @@ const mongoose = require('mongoose');
 const Reward = require('../models/Reward');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+const connectDB = require('../config/db');
+// `connectDB` is exported as the module; `disconnectDB` is attached as a property
+const disconnectDB = connectDB.disconnectDB;
 
 const seedRewards = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('Connected to DB for seeding rewards...');
+        const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rpg';
+        await connectDB(mongoUri);
+        console.log('Connected to DB for seeding rewards...', mongoUri);
 
         await Reward.deleteMany({});
 
@@ -82,7 +86,7 @@ const seedRewards = async () => {
                 image: 'warrior_weapon_1',
                 effects: { buffStrength: 2 },
                 rarity: 'common',
-                allowedClasses: ['warrior'],
+                allowedClasses: ['warrior', 'all'],
                 value: 20,
                 cost: 50,
                 tier: 1
@@ -96,7 +100,7 @@ const seedRewards = async () => {
                 image: 'warrior_weapon_2',
                 effects: { buffStrength: 5 },
                 rarity: 'common',
-                allowedClasses: ['warrior'],
+                allowedClasses: ['warrior', 'all'],
                 value: 60,
                 cost: 150,
                 tier: 2
@@ -110,7 +114,7 @@ const seedRewards = async () => {
                 image: 'warrior_weapon_3',
                 effects: { buffStrength: 10, buffDexterity: -2 },
                 rarity: 'uncommon',
-                allowedClasses: ['warrior'],
+                allowedClasses: ['warrior', 'all'],
                 value: 150,
                 cost: 400,
                 tier: 3
@@ -123,7 +127,7 @@ const seedRewards = async () => {
                 image: 'warrior_weapon_4', // Using visual 4 for rune look
                 effects: { buffStrength: 5, buffIntelligence: 10 },
                 rarity: 'rare',
-                allowedClasses: ['warrior'],
+                allowedClasses: ['warrior', 'all'],
                 value: 200,
                 cost: 500,
                 tier: 3
@@ -137,7 +141,7 @@ const seedRewards = async () => {
                 image: 'warrior_weapon_5',
                 effects: { buffStrength: 20, buffVitality: 5 },
                 rarity: 'epic',
-                allowedClasses: ['warrior'],
+                allowedClasses: ['warrior', 'all'],
                 value: 800,
                 cost: 2000,
                 tier: 4
@@ -155,7 +159,7 @@ const seedRewards = async () => {
                 image: 'mage_weapon_1',
                 effects: { buffIntelligence: 2 },
                 rarity: 'common',
-                allowedClasses: ['mage'],
+                allowedClasses: ['mage', 'all'],
                 value: 20,
                 cost: 50,
                 tier: 1
@@ -169,7 +173,7 @@ const seedRewards = async () => {
                 image: 'mage_weapon_2',
                 effects: { buffIntelligence: 5 },
                 rarity: 'common',
-                allowedClasses: ['mage'],
+                allowedClasses: ['mage', 'all'],
                 value: 60,
                 cost: 150,
                 tier: 2
@@ -183,7 +187,7 @@ const seedRewards = async () => {
                 image: 'mage_weapon_3',
                 effects: { buffIntelligence: 12, buffVitality: -3 },
                 rarity: 'uncommon',
-                allowedClasses: ['mage'],
+                allowedClasses: ['mage', 'all'],
                 value: 150,
                 cost: 400,
                 tier: 3
@@ -196,7 +200,7 @@ const seedRewards = async () => {
                 image: 'mage_weapon_4',
                 effects: { buffIntelligence: 8, buffStrength: 5 },
                 rarity: 'rare',
-                allowedClasses: ['mage'],
+                allowedClasses: ['mage', 'all'],
                 value: 200,
                 cost: 550,
                 tier: 3
@@ -210,7 +214,7 @@ const seedRewards = async () => {
                 image: 'mage_weapon_5',
                 effects: { buffIntelligence: 25 },
                 rarity: 'epic',
-                allowedClasses: ['mage'],
+                allowedClasses: ['mage', 'all'],
                 value: 900,
                 cost: 2500,
                 tier: 4
@@ -228,7 +232,7 @@ const seedRewards = async () => {
                 image: 'rogue_weapon_1',
                 effects: { buffDexterity: 2 },
                 rarity: 'common',
-                allowedClasses: ['rogue'],
+                allowedClasses: ['rogue', 'all'],
                 value: 20,
                 cost: 50,
                 tier: 1
@@ -242,7 +246,7 @@ const seedRewards = async () => {
                 image: 'rogue_weapon_2',
                 effects: { buffDexterity: 4, buffStrength: 2 },
                 rarity: 'common',
-                allowedClasses: ['rogue'],
+                allowedClasses: ['rogue', 'all'],
                 value: 65,
                 cost: 160,
                 tier: 2
@@ -256,7 +260,7 @@ const seedRewards = async () => {
                 image: 'rogue_weapon_3',
                 effects: { buffDexterity: 10 },
                 rarity: 'uncommon',
-                allowedClasses: ['rogue'],
+                allowedClasses: ['rogue', 'all'],
                 value: 150,
                 cost: 400,
                 tier: 3
@@ -269,7 +273,7 @@ const seedRewards = async () => {
                 image: 'rogue_weapon_4',
                 effects: { buffDexterity: 7, buffLuck: 5 },
                 rarity: 'rare',
-                allowedClasses: ['rogue'],
+                allowedClasses: ['rogue', 'all'],
                 value: 220,
                 cost: 600,
                 tier: 3
@@ -283,7 +287,7 @@ const seedRewards = async () => {
                 image: 'rogue_weapon_5',
                 effects: { buffDexterity: 18, buffLuck: 5 },
                 rarity: 'epic',
-                allowedClasses: ['rogue'],
+                allowedClasses: ['rogue', 'all'],
                 value: 850,
                 cost: 2200,
                 tier: 4
@@ -324,7 +328,7 @@ const seedRewards = async () => {
                 image: 'armour_plate',
                 effects: { buffVitality: 12, buffDexterity: -3 },
                 rarity: 'rare',
-                allowedClasses: ['warrior'],
+                allowedClasses: ['all'],
                 value: 250,
                 cost: 700
             },
@@ -336,7 +340,7 @@ const seedRewards = async () => {
                 image: 'robe_novice',
                 effects: { buffIntelligence: 2 },
                 rarity: 'common',
-                allowedClasses: ['mage'],
+                allowedClasses: ['all'],
                 value: 40,
                 cost: 80
             },
@@ -348,19 +352,19 @@ const seedRewards = async () => {
                 image: 'robe_master',
                 effects: { buffIntelligence: 8, buffVitality: 2 },
                 rarity: 'rare',
-                allowedClasses: ['mage'],
+                allowedClasses: ['all'],
                 value: 220,
                 cost: 600
             },
 
             // ==========================================
-            // 💍 ACCESSORIES
+            // 💍 ACCESSORIES (RINGS - DARK SOULS STYLE)
             // ==========================================
             {
                 name: 'Gold Ring',
                 desc: 'Shiny. +2 LUCK',
                 type: 'accessory',
-                slot: 'accessory',
+                slot: 'ring',
                 image: 'ring_gold',
                 effects: { buffLuck: 2 },
                 rarity: 'common',
@@ -372,14 +376,164 @@ const seedRewards = async () => {
                 name: 'Ring of Power',
                 desc: 'Classic artifact. +2 All Stats',
                 type: 'accessory',
-                slot: 'accessory',
+                slot: 'ring',
                 image: 'ring_of_power',
                 effects: { buffStrength: 2, buffIntelligence: 2, buffVitality: 2, buffDexterity: 2, buffLuck: 2 },
-                rarity: 'legendary', // Shop legendary is very expensive
+                rarity: 'legendary',
                 allowedClasses: ['all'],
                 value: 1000,
                 cost: 5000,
                 obtainableInShop: true
+            },
+
+            // NEW RINGS - Dark Souls Style (Tier 1-2)
+            {
+                name: 'Ring of the Giant',
+                desc: 'Enhances strength. +5 STR',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_giant',
+                effects: { buffStrength: 5 },
+                rarity: 'uncommon',
+                allowedClasses: ['all'],
+                value: 150,
+                cost: 400
+            },
+            {
+                name: 'Ring of Intellect',
+                desc: 'Sharpens the mind. +5 INT',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_intellect',
+                effects: { buffIntelligence: 5 },
+                rarity: 'uncommon',
+                allowedClasses: ['all'],
+                value: 150,
+                cost: 400
+            },
+            {
+                name: 'Ring of Vitality',
+                desc: 'Increases endurance. +5 VIT',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_vitality',
+                effects: { buffVitality: 5 },
+                rarity: 'uncommon',
+                allowedClasses: ['all'],
+                value: 150,
+                cost: 400
+            },
+            {
+                name: 'Ring of Agility',
+                desc: 'Quickens movement. +5 DEX',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_agility',
+                effects: { buffDexterity: 5 },
+                rarity: 'uncommon',
+                allowedClasses: ['all'],
+                value: 150,
+                cost: 400
+            },
+            {
+                name: 'Ring of Fortune',
+                desc: 'Lady luck smiles upon you. +5 LUCK',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_fortune',
+                effects: { buffLuck: 5 },
+                rarity: 'uncommon',
+                allowedClasses: ['all'],
+                value: 150,
+                cost: 400
+            },
+
+            // NEW RINGS - Class-Favoring (Tier 2-3)
+            {
+                name: 'Ring of Physical Might',
+                desc: 'Boosts physical prowess. +5 STR, +10% physical damage',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_fire',
+                effects: { buffStrength: 5, physicalDamagePercent: 10 },
+                rarity: 'rare',
+                allowedClasses: ['all'],
+                value: 300,
+                cost: 700
+            },
+            {
+                name: 'Ring of Arcane Power',
+                desc: 'Amplifies magical output. +5 INT, +10% magic damage',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_frost',
+                effects: { buffIntelligence: 5, magicDamagePercent: 10 },
+                rarity: 'rare',
+                allowedClasses: ['all'],
+                value: 300,
+                cost: 700
+            },
+            {
+                name: 'Ring of Mana Flow',
+                desc: 'Expands the mana reservoir. +20 max mana, +2 mana regen',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_poison',
+                effects: { buffMaxMana: 20, manaRegen: 2 },
+                rarity: 'rare',
+                allowedClasses: ['all'],
+                value: 250,
+                cost: 700
+            },
+            {
+                name: 'Ring of Precision',
+                desc: 'Sharpens your strikes. +5% crit chance, +3 DEX',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_lightning',
+                effects: { buffCritChance: 5, buffDexterity: 3 },
+                rarity: 'rare',
+                allowedClasses: ['all'],
+                value: 275,
+                cost: 700
+            },
+
+            // NEW RINGS - Hybrid & Specialized (Tier 3)
+            {
+                name: 'Ring of the Warrior Mage',
+                desc: 'For those who walk between worlds. +3 STR, +3 INT',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_hybrid',
+                effects: { buffStrength: 3, buffIntelligence: 3 },
+                rarity: 'rare',
+                allowedClasses: ['all'],
+                value: 280,
+                cost: 750
+            },
+            {
+                name: 'Ring of Eternal Defense',
+                desc: 'Ancient magic of protection. +10 Armor Rating, +3 VIT',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_defense',
+                effects: { armorRating: 10, buffVitality: 3 },
+                rarity: 'rare',
+                allowedClasses: ['all'],
+                value: 300,
+                cost: 850
+            },
+            {
+                name: 'Ring of Mystic Knowledge',
+                desc: 'Channels arcane energy. +10 Magic Resistance, +4 INT',
+                type: 'accessory',
+                slot: 'ring',
+                image: 'ring_mystic',
+                effects: { magicResistance: 10, buffIntelligence: 4 },
+                rarity: 'rare',
+                allowedClasses: ['all'],
+                value: 300,
+                cost: 850
             },
 
             // ==========================================
@@ -393,7 +547,7 @@ const seedRewards = async () => {
                 image: 'legendary_sword',
                 effects: { buffStrength: 25, buffVitality: -10 },
                 rarity: 'legendary',
-                allowedClasses: ['warrior'],
+                allowedClasses: ['all'],
                 value: 5000,
                 cost: 99999,
                 obtainableInShop: false // HIDDEN
@@ -406,7 +560,7 @@ const seedRewards = async () => {
                 image: 'legendary_book',
                 effects: { buffIntelligence: 30, maxHpBonus: -50 },
                 rarity: 'legendary',
-                allowedClasses: ['mage'],
+                allowedClasses: ['all'],
                 value: 5000,
                 cost: 99999,
                 obtainableInShop: false // HIDDEN
@@ -419,18 +573,44 @@ const seedRewards = async () => {
                 image: 'legendary_dagger',
                 effects: { buffDexterity: 20, buffLuck: 15 },
                 rarity: 'legendary',
-                allowedClasses: ['rogue'],
+                allowedClasses: ['all'],
                 value: 5000,
                 cost: 99999,
                 obtainableInShop: false // HIDDEN
             }
         ];
 
+        // Scale ring effects based on price so high-cost rings are worth buying
+        // This post-process allows designers to set costs and have effects scaled
+        // automatically during seeding (small bump for mid-tier, bigger for legendaries).
+        const scaleRingEffects = (items) => {
+            items.forEach(it => {
+                if (it.type === 'accessory' && it.slot === 'ring' && it.cost) {
+                    // multiplier: 1 + min(cost/5000, 2)
+                    // cost 5000 -> multiplier 2x, cost 2500 -> 1.5x, etc. capped for sanity
+                    const mult = 1 + Math.min(it.cost / 5000, 2);
+                    if (it.effects && typeof it.effects === 'object') {
+                        Object.keys(it.effects).forEach(k => {
+                            const v = it.effects[k];
+                            if (typeof v === 'number') {
+                                // Round to maintain integer-like buffs
+                                it.effects[k] = Math.round(v * mult);
+                            }
+                        });
+                    }
+                }
+            });
+        };
+
+        scaleRingEffects(rewards);
+
         await Reward.insertMany(rewards);
         console.log('Rewards seeded successfully with', rewards.length, 'items');
-        process.exit();
+        await disconnectDB();
+        process.exit(0);
     } catch (err) {
         console.error(err);
+        try { await disconnectDB(); } catch (e) {}
         process.exit(1);
     }
 };

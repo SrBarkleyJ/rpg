@@ -59,6 +59,7 @@ export const es = {
     buy: 'COMPRAR',
     notEnoughGold: '¡No tienes suficiente oro!',
     buySuccess: 'Has comprado',
+    failedToLoadShop: 'Error al cargar tienda',
 
     // Combat
     combatTitle: 'ARENA',
@@ -156,7 +157,7 @@ export const es = {
     physicalDamage: 'Daño Físico',
     magicalDamage: 'Daño Mágico',
     maxHP: 'PV Máximos',
-    criticalChance: 'Probabilidad de Crítico',
+    criticalChance: 'Prob. Crítico',
     lootAndCrits: 'Botín y Críticos',
     calculatedStats: 'ESTADÍSTICAS CALCULADAS',
 
@@ -192,6 +193,8 @@ export const es = {
     // Skills
     skillsTitle: 'HABILIDADES',
     upgrade: 'MEJORAR',
+    failedToLoadSkills: 'Error al cargar habilidades',
+    failedToUpgradeSkill: 'Error al mejorar habilidad',
 
     // Unified Skills
     'Heroic Strike': 'Golpe Heroico',
@@ -347,9 +350,18 @@ export const es = {
     enemy_dread_bat: 'Murciélago Aterrador',
     enemy_chrysalis_moth: 'Polilla Crisálida',
     enemy_plague_zombie: 'Zombi Pestilente',
-    enemy_bone_spider: 'Araña de Huesos',
-    enemy_spike_horror: 'Horror de Púas',
-    enemy_abyssal_behemoth: 'Behemot Abisal',
-    enemy_void_stalker: 'Acechador del Vacío',
-    enemy_eldritch_abomination: 'Abominación Eldritch',
+
+    // Missing translations
+    itemUsed: 'Item usado',
+    itemNotFound: 'Item no encontrado',
+    failedToUseItem: 'Error al usar item',
+    viewEquipment: 'Ver Equipo',
+
+    // Combat
+    failedToEnterDungeon: 'Error al entrar a mazmorra',
+    failedToContinueDungeon: 'Error al continuar mazmorra',
+
+    // Ring Selector
+    selectRingToReplace: 'Seleccionar Anillo a Reemplazar',
+    ringsEquippedMessage: 'Tienes 4 anillos equipados. Elige cuál reemplazar:',
 };

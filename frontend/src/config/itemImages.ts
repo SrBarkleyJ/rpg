@@ -36,9 +36,23 @@ import armorPlate from '../../assets/images/armour_plate.png'; // Note 'armour' 
 import robeNovice from '../../assets/images/robe_novice.png';
 import robeMaster from '../../assets/images/robe_master.png';
 
-// --- Accessories ---
+// --- Accessories (Rings) ---
 import ringGold from '../../assets/images/ring_gold.png';
 import ringOfPower from '../../assets/images/ring_of_power.png';
+import ringGiant from '../../assets/images/ring_giant.png';
+import ringIntellect from '../../assets/images/ring_intellect.png';
+import ringVitality from '../../assets/images/ring_vitality.png';
+import ringAgility from '../../assets/images/ring_agility.png';
+import ringFortune from '../../assets/images/ring_fortune.png';
+// Note: some ring image files are not yet provided in assets.
+// Import closest matching files that exist or fall back to available placeholders
+import ringFire from '../../assets/images/ring_phisichal.png';
+import ringFrost from '../../assets/images/ring_power.png';
+import ringPoison from '../../assets/images/ring_mana.png';
+import ringLightning from '../../assets/images/ring_power.png';
+import ringHybrid from '../../assets/images/ring_power.png';
+import ringDefense from '../../assets/images/ring_defense.png';
+import ringMystic from '../../assets/images/ring_power.png';
 
 // --- Legendary / Easter Eggs ---
 import legendarySword from '../../assets/images/legendary_sword.png';
@@ -82,9 +96,21 @@ export const ITEM_IMAGES: Record<string, any> = {
     'robe_novice': robeNovice,
     'robe_master': robeMaster,
 
-    // Accessories
+    // Accessories (Rings)
     'ring_gold': ringGold,
     'ring_of_power': ringOfPower,
+    'ring_giant': ringGiant,
+    'ring_intellect': ringIntellect,
+    'ring_vitality': ringVitality,
+    'ring_agility': ringAgility,
+    'ring_fortune': ringFortune,
+    'ring_fire': ringFire,
+    'ring_frost': ringFrost,
+    'ring_poison': ringPoison,
+    'ring_lightning': ringLightning,
+    'ring_hybrid': ringHybrid,
+    'ring_defense': ringDefense,
+    'ring_mystic': ringMystic,
 
     // Legendaries
     'legendary_sword': legendarySword,

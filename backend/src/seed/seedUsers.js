@@ -4,10 +4,12 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const { getInitialStats, getInitialHP } = require('../utils/classStats');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+const connectDB = require('../config/db');
+const { disconnectDB } = require('../config/db');
 
 const seedUsers = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await connectDB(process.env.MONGO_URI);
         console.log('Connected to DB for seeding users...');
 
         await User.deleteMany({});
@@ -62,9 +64,11 @@ const seedUsers = async () => {
 
         await User.insertMany(users);
         console.log('Users seeded successfully with classes and stats');
-        process.exit();
+        await disconnectDB();
+        process.exit(0);
     } catch (err) {
         console.error(err);
+        try { await disconnectDB(); } catch (e) {}
         process.exit(1);
     }
 };
