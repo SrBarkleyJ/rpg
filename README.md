@@ -145,6 +145,44 @@ Backend will run on `http://localhost:4000`
 
 *(Add screenshots of your app here)*
 
+## 🗺️ Roadmap
+
+### Fase 1: Mejoras de Combate (Q1 2025)
+- [ ] **Combate contra múltiples enemigos**: Implementar batallas con varios enemigos simultáneamente
+- [ ] **Sistema de oleadas**: Enemigos aparecen en oleadas progresivas
+- [ ] **IA enemiga mejorada**: Comportamientos más inteligentes y variados
+- [ ] **Animaciones de combate avanzadas**: Nuevos efectos visuales y transiciones
+
+### Fase 2: Sistema Social (Q2 2025)
+- [ ] **Leaderboard global**: Ranking de todos los usuarios por nivel, victorias y estadísticas
+- [ ] **Sistema de amigos**: Agregar y gestionar lista de amigos
+- [ ] **Mensajes entre jugadores**: Chat básico entre usuarios
+- [ ] **Estadísticas comparativas**: Ver progreso relativo a otros jugadores
+
+### Fase 3: Contenido Expandido (Q3 2025)
+- [ ] **Nuevas misiones**: Sistema de misiones secundarias con recompensas especiales
+- [ ] **Eventos temporales**: Contenido limitado por tiempo con recompensas exclusivas
+- [ ] **Sistema de logros**: Insignias y títulos desbloqueables
+- [ ] **Modo historia**: Campaña narrativa con quests conectadas
+
+### Fase 4: Mascotas y Compañeros (Q4 2025)
+- [ ] **Sistema de mascotas**: Criaturas que acompañan al jugador
+- [ ] **Mascotas combatientes**: Participan activamente en batallas
+- [ ] **Crianza y evolución**: Sistema de crecimiento y mejora de mascotas
+- [ ] **Colección de mascotas**: Diferentes especies con habilidades únicas
+
+### Fase 5: Expansión Visual y de Contenido (Q1 2026)
+- [ ] **Nuevos sprites**: Personajes, enemigos y objetos adicionales
+- [ ] **Estilos visuales alternativos**: Temas y skins personalizables
+- [ ] **Ampliación de dungeons**: Más niveles, bosses y áreas temáticas
+- [ ] **Sistema de dificultad**: Modos fácil, normal, difícil y extremo
+
+### Fase 6: Características Avanzadas (Q2 2026)
+- [ ] **Modo multijugador**: Batallas cooperativas
+- [ ] **Gremios/Clan**: Sistema de equipos y colaboración
+- [ ] **Economía avanzada**: Comercio entre jugadores
+- [ ] **Eventos globales**: Competiciones y torneos masivos
+
 ## 🤝 Contributing
 
 1. Fork the repository
