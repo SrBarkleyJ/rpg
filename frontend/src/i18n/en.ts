@@ -329,6 +329,20 @@ export const en = {
     item_GrimoireofForbiddenKnowledge: 'Grimoire of Forbidden Knowledge',
     item_DaggerofTime: 'Dagger of Time',
 
+    // New Rings - Dark Souls Style
+    item_RingoftheGiant: 'Ring of the Giant',
+    item_RingofIntellect: 'Ring of Intellect',
+    item_RingofVitality: 'Ring of Vitality',
+    item_RingofAgility: 'Ring of Agility',
+    item_RingofFortune: 'Ring of Fortune',
+    item_RingofPhysicalMight: 'Ring of Physical Might',
+    item_RingofArcanePower: 'Ring of Arcane Power',
+    item_RingofManaFlow: 'Ring of Mana Flow',
+    item_RingofPrecision: 'Ring of Precision',
+    item_RingoftheWarriorMage: 'Ring of the Warrior Mage',
+    item_RingofEternalDefense: 'Ring of Eternal Defense',
+    item_RingofMysticKnowledge: 'Ring of Mystic Knowledge',
+
     // Enemies
     enemy_crimson_imp: 'Crimson Imp',
     enemy_swamp_zombie: 'Swamp Zombie',

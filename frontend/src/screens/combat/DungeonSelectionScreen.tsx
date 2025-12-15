@@ -150,6 +150,7 @@ const styles = StyleSheet.create({
     list: {
         padding: 16,
         gap: 16,
+        paddingBottom:91
     },
     dungeonCard: {
         padding: 16,

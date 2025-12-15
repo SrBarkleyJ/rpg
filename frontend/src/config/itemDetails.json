@@ -1,0 +1,316 @@
+{
+  "items": {
+    "Minor Health Potion": {
+      "name": "Minor Health Potion",
+      "description": "A small vial containing a red liquid that restores 50 HP. Essential for adventurers on the go.",
+      "effects": ["Restores 50 HP"],
+      "rarity": "common",
+      "type": "consumable",
+      "flavor": "The basic healing potion that every adventurer starts with. Simple, reliable, and life-saving."
+    },
+    "Health Potion": {
+      "name": "Health Potion",
+      "description": "A standard red potion that restores 100 HP. The reliable choice for most adventurers.",
+      "effects": ["Restores 100 HP"],
+      "rarity": "uncommon",
+      "type": "consumable",
+      "flavor": "The gold standard of healing potions. Not too weak, not too expensive."
+    },
+    "Greater Health Potion": {
+      "name": "Greater Health Potion",
+      "description": "A large vial of potent red liquid that restores 250 HP. For serious battles.",
+      "effects": ["Restores 250 HP"],
+      "rarity": "rare",
+      "type": "consumable",
+      "flavor": "When you need to get back in the fight quickly. This potion packs a serious punch."
+    },
+    "Mana Potion": {
+      "name": "Mana Potion",
+      "description": "A blue vial that restores 50 Mana. Keeps the magic flowing.",
+      "effects": ["Restores 50 Mana"],
+      "rarity": "common",
+      "type": "consumable",
+      "flavor": "The magical equivalent of a health potion. Essential for spellcasters."
+    },
+    "Elixir of Power": {
+      "name": "Elixir of Power",
+      "description": "A shimmering golden elixir that temporarily boosts all stats by +5 for 3 turns.",
+      "effects": ["+5 to all stats for 3 turns"],
+      "rarity": "rare",
+      "type": "consumable",
+      "flavor": "The ultimate combat enhancer. When you need to turn the tide of battle."
+    },
+    "Rusty Sword": {
+      "name": "Rusty Sword",
+      "description": "An old, weathered sword that's still sharp enough to be useful. +2 STR",
+      "effects": ["+2 Strength"],
+      "rarity": "common",
+      "type": "weapon",
+      "flavor": "Every great hero started with a rusty sword. This one's seen better days, but it'll get the job done."
+    },
+    "Iron Broadsword": {
+      "name": "Iron Broadsword",
+      "description": "A heavy, well-balanced sword. +5 STR",
+      "effects": ["+5 Strength"],
+      "rarity": "common",
+      "type": "weapon",
+      "flavor": "The workhorse of the adventuring world. Reliable, sturdy, and gets the job done."
+    },
+    "Steel Claymore": {
+      "name": "Steel Claymore",
+      "description": "A massive blade that requires great strength to wield. +10 STR, -2 Speed",
+      "effects": ["+10 Strength", "-2 Dexterity"],
+      "rarity": "uncommon",
+      "type": "weapon",
+      "flavor": "For those who believe that bigger is better. This sword demands respect and strength."
+    },
+    "Rune Blade": {
+      "name": "Rune Blade",
+      "description": "A sword etched with magical runes that enhance both physical and magical power. +5 STR, +10 INT",
+      "effects": ["+5 Strength", "+10 Intelligence"],
+      "rarity": "rare",
+      "type": "weapon",
+      "flavor": "A perfect blend of martial prowess and arcane might. The weapon of a true battle mage."
+    },
+    "Dragon Slayer": {
+      "name": "Dragon Slayer",
+      "description": "A legendary sword forged in dragonfire. +20 STR, +5 VIT",
+      "effects": ["+20 Strength", "+5 Vitality"],
+      "rarity": "epic",
+      "type": "weapon",
+      "flavor": "Said to have been used to slay the great dragon of the northern mountains. A weapon of legend."
+    },
+    "Wooden Staff": {
+      "name": "Wooden Staff",
+      "description": "A basic wooden staff that serves as a focus for magical energy. +2 INT",
+      "effects": ["+2 Intelligence"],
+      "rarity": "common",
+      "type": "weapon",
+      "flavor": "The first step on the path of magic. Simple wood, but it channels power effectively."
+    },
+    "Apprentice Wand": {
+      "name": "Apprentice Wand",
+      "description": "A standard magical focus issued to magic academy students. +5 INT",
+      "effects": ["+5 Intelligence"],
+      "rarity": "common",
+      "type": "weapon",
+      "flavor": "Every great wizard started as an apprentice. This wand has helped many begin their journey."
+    },
+    "Crystal Staff": {
+      "name": "Crystal Staff",
+      "description": "A staff topped with a clear crystal that amplifies magical power. +12 INT, -3 VIT",
+      "effects": ["+12 Intelligence", "-3 Vitality"],
+      "rarity": "uncommon",
+      "type": "weapon",
+      "flavor": "The crystal focuses magical energy with incredible precision, but drains the user's life force."
+    },
+    "Void Scepter": {
+      "name": "Void Scepter",
+      "description": "A dark scepter that draws power from the void. +8 INT, +5 STR",
+      "effects": ["+8 Intelligence", "+5 Strength"],
+      "rarity": "rare",
+      "type": "weapon",
+      "flavor": "Power comes at a price. This scepter offers great magical strength but whispers of darkness."
+    },
+    "Divine Staff": {
+      "name": "Divine Staff",
+      "description": "A staff that channels divine energy. +25 INT",
+      "effects": ["+25 Intelligence"],
+      "rarity": "epic",
+      "type": "weapon",
+      "flavor": "Blessed by the gods themselves. This staff radiates holy power and wisdom."
+    },
+    "Iron Dagger": {
+      "name": "Iron Dagger",
+      "description": "A small but deadly blade. +2 DEX",
+      "effects": ["+2 Dexterity"],
+      "rarity": "common",
+      "type": "weapon",
+      "flavor": "Small but deadly. Perfect for quick strikes and precise movements."
+    },
+    "Poisoned Knife": {
+      "name": "Poisoned Knife",
+      "description": "A dagger coated in deadly venom. +4 DEX, +2 STR",
+      "effects": ["+4 Dexterity", "+2 Strength"],
+      "rarity": "common",
+      "type": "weapon",
+      "flavor": "A assassin's favorite. The poison does the work while you stay at a safe distance."
+    },
+    "Twin Blades": {
+      "name": "Twin Blades",
+      "description": "A pair of perfectly balanced daggers meant to be used together. +10 DEX",
+      "effects": ["+10 Dexterity"],
+      "rarity": "uncommon",
+      "type": "weapon",
+      "flavor": "Dance of death with two blades. Speed and precision are your greatest weapons."
+    },
+    "Shadow Blade": {
+      "name": "Shadow Blade",
+      "description": "A blade that seems to absorb light. +7 DEX, +5 LUCK",
+      "effects": ["+7 Dexterity", "+5 Luck"],
+      "rarity": "rare",
+      "type": "weapon",
+      "flavor": "Hard to see, impossible to avoid. Lady luck favors those who strike from the shadows."
+    },
+    "Assassin's Edge": {
+      "name": "Assassin's Edge",
+      "description": "A legendary blade known for its perfect balance. +18 DEX, +5 LUCK",
+      "effects": ["+18 Dexterity", "+5 Luck"],
+      "rarity": "epic",
+      "type": "weapon",
+      "flavor": "The weapon of legends. One strike, one kill. The assassin's ultimate tool."
+    },
+    "Leather Tunic": {
+      "name": "Leather Tunic",
+      "description": "Light leather armor that provides basic protection. +3 VIT",
+      "effects": ["+3 Vitality"],
+      "rarity": "common",
+      "type": "armor",
+      "flavor": "Comfortable and flexible. Perfect for adventurers who value mobility over heavy protection."
+    },
+    "Chainmail Vest": {
+      "name": "Chainmail Vest",
+      "description": "Interlocking metal rings provide balanced protection. +6 VIT, -1 DEX",
+      "effects": ["+6 Vitality", "-1 Dexterity"],
+      "rarity": "uncommon",
+      "type": "armor",
+      "flavor": "The classic adventurer's armor. Good protection without sacrificing too much mobility."
+    },
+    "Plate Armor": {
+      "name": "Plate Armor",
+      "description": "Heavy metal plates that offer excellent protection. +12 VIT, -3 DEX",
+      "effects": ["+12 Vitality", "-3 Dexterity"],
+      "rarity": "rare",
+      "type": "armor",
+      "flavor": "For those who believe that the best defense is a good offense... or just really good defense."
+    },
+    "Novice Robe": {
+      "name": "Novice Robe",
+      "description": "Simple cloth robes worn by magic students. +2 INT",
+      "effects": ["+2 Intelligence"],
+      "rarity": "common",
+      "type": "armor",
+      "flavor": "The traditional garb of magic apprentices. Comfortable and imbued with minor protective spells."
+    },
+    "Master Robe": {
+      "name": "Master Robe",
+      "description": "Finely woven robes that enhance magical abilities. +8 INT, +2 VIT",
+      "effects": ["+8 Intelligence", "+2 Vitality"],
+      "rarity": "rare",
+      "type": "armor",
+      "flavor": "Worn by masters of the arcane arts. These robes seem to shimmer with inner power."
+    },
+    "Gold Ring": {
+      "name": "Gold Ring",
+      "description": "A simple but elegant gold band. +2 LUCK",
+      "effects": ["+2 Luck"],
+      "rarity": "common",
+      "type": "accessory",
+      "flavor": "Sometimes the simplest accessories bring the most fortune. This ring seems to catch the light just right."
+    },
+    "Ring of Power": {
+      "name": "Ring of Power",
+      "description": "A legendary artifact that enhances all abilities. +2 All Stats",
+      "effects": ["+2 to all stats"],
+      "rarity": "legendary",
+      "type": "accessory",
+      "flavor": "One ring to rule them all. This artifact pulses with ancient power and wisdom."
+    },
+    "Ring of the Giant": {
+      "name": "Ring of the Giant",
+      "description": "A massive ring that enhances physical strength. +5 STR",
+      "effects": ["+5 Strength"],
+      "rarity": "uncommon",
+      "type": "accessory",
+      "flavor": "Said to have been worn by giants in ancient times. It makes the wearer feel... larger than life."
+    },
+    "Ring of Intellect": {
+      "name": "Ring of Intellect",
+      "description": "A ring that sharpens the mind and enhances magical abilities. +5 INT",
+      "effects": ["+5 Intelligence"],
+      "rarity": "uncommon",
+      "type": "accessory",
+      "flavor": "Knowledge is power, and this ring amplifies both. Your thoughts become clearer, your magic stronger."
+    },
+    "Ring of Vitality": {
+      "name": "Ring of Vitality",
+      "description": "A ring that increases endurance and physical resilience. +5 VIT",
+      "effects": ["+5 Vitality"],
+      "rarity": "uncommon",
+      "type": "accessory",
+      "flavor": "Life flows more strongly through those who wear this ring. Wounds heal faster, fatigue comes later."
+    },
+    "Ring of Agility": {
+      "name": "Ring of Agility",
+      "description": "A ring that enhances speed and dexterity. +5 DEX",
+      "effects": ["+5 Dexterity"],
+      "rarity": "uncommon",
+      "type": "accessory",
+      "flavor": "Movement becomes instinct, reflexes become lightning. This ring makes you untouchable."
+    },
+    "Ring of Fortune": {
+      "name": "Ring of Fortune",
+      "description": "A ring that seems to bend luck in the wearer's favor. +5 LUCK",
+      "effects": ["+5 Luck"],
+      "rarity": "uncommon",
+      "type": "accessory",
+      "flavor": "Lady luck herself must have crafted this ring. Opportunities appear where none existed before."
+    },
+    "Ring of Physical Might": {
+      "name": "Ring of Physical Might",
+      "description": "A ring that boosts physical prowess and damage. +5 STR, +10% physical damage",
+      "effects": ["+5 Strength", "+10% physical damage"],
+      "rarity": "rare",
+      "type": "accessory",
+      "flavor": "Raw power flows through this ring. Your strikes hit harder, your presence more intimidating."
+    },
+    "Ring of Arcane Power": {
+      "name": "Ring of Arcane Power",
+      "description": "A ring that amplifies magical output. +5 INT, +10% magic damage",
+      "effects": ["+5 Intelligence", "+10% magic damage"],
+      "rarity": "rare",
+      "type": "accessory",
+      "flavor": "Arcane energy crackles around this ring. Your spells become more potent, more destructive."
+    },
+    "Ring of Mana Flow": {
+      "name": "Ring of Mana Flow",
+      "description": "A ring that expands magical reserves. +20 max mana, +2 mana regen",
+      "effects": ["+20 max mana", "+2 mana regeneration"],
+      "rarity": "rare",
+      "type": "accessory",
+      "flavor": "Mana flows like a river through this ring. Your magical well never runs dry."
+    },
+    "Ring of Precision": {
+      "name": "Ring of Precision",
+      "description": "A ring that sharpens strikes and reflexes. +5% crit chance, +3 DEX",
+      "effects": ["+5% critical chance", "+3 Dexterity"],
+      "rarity": "rare",
+      "type": "accessory",
+      "flavor": "Precision is power. This ring makes every strike count, every movement perfect."
+    },
+    "Ring of the Warrior Mage": {
+      "name": "Ring of the Warrior Mage",
+      "description": "A ring for those who walk between worlds of martial and magical power. +3 STR, +3 INT",
+      "effects": ["+3 Strength", "+3 Intelligence"],
+      "rarity": "rare",
+      "type": "accessory",
+      "flavor": "The perfect balance of blade and spell. For those who master both worlds."
+    },
+    "Ring of Eternal Defense": {
+      "name": "Ring of Eternal Defense",
+      "description": "Ancient magic of protection. +10 Armor Rating, +3 VIT",
+      "effects": ["+10 armor rating", "+3 Vitality"],
+      "rarity": "rare",
+      "type": "accessory",
+      "flavor": "Eternal protection against all threats. This ring has guarded heroes for centuries."
+    },
+    "Ring of Mystic Knowledge": {
+      "name": "Ring of Mystic Knowledge",
+      "description": "A ring that channels arcane energy and protects against magic. +10 Magic Resistance, +4 INT",
+      "effects": ["+10 magic resistance", "+4 Intelligence"],
+      "rarity": "rare",
+      "type": "accessory",
+      "flavor": "Knowledge is the greatest defense. This ring protects both body and mind from mystical threats."
+    }
+  }
+}

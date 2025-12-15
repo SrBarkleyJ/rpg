@@ -21,6 +21,7 @@ import PixelCard from '../../components/UI/Card';
 import { getItemImage } from '../../config/itemImages';
 import { hapticSuccess } from '../../utils/haptics';
 import AnimatedPressable from '../../components/UI/AnimatedPressable';
+import ItemDetailModal from '../../components/modals/ItemDetailModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = (SCREEN_WIDTH - spacing.md * 2 - spacing.sm) / 2;
@@ -33,6 +34,10 @@ const ShopScreen = () => {
     const { loadInventory } = useInventory();
     const { theme } = useTheme();
     const { t, translateItem } = useLanguage();
+
+    // Modal state
+    const [selectedItem, setSelectedItem] = useState<any>(null);
+    const [itemDetailVisible, setItemDetailVisible] = useState(false);
 
     const categories = [
         { id: 'All', label: t.cat_all || 'All' },
@@ -120,7 +125,7 @@ const ShopScreen = () => {
         });
     }, [allItems, category]);
 
-    const handleBuyItem = async (item) => {
+    const handleBuyItem = useCallback(async (item) => {
         if (!user || user.gold < item.cost) {
             Alert.alert(t.error || 'Error', t.notEnoughGold || 'Not enough gold');
             return;
@@ -129,17 +134,15 @@ const ShopScreen = () => {
         try {
             const result = await rewardApi.buyReward(item._id);
             if (result.data?.user) {
-                // IMPORTANT: The API returns { success: true, data: { user: ... } }
+                // Update user state immediately without reloading all items
                 await updateUser(result.data.user);
+                await loadInventory(); // Only reload inventory
 
                 hapticSuccess();
                 Alert.alert(
                     t.success || 'Success',
                     `${t.buySuccess || 'Purchased'} ${translateItem(item.name)}!`
                 );
-                // Don't just reload items, also ensure local user state reflects changes immediately if updateUser is async
-                loadItems();
-                loadInventory();
             }
         } catch (error: any) {
             console.error('Purchase error:', error);
@@ -148,7 +151,25 @@ const ShopScreen = () => {
                 error.response?.data?.message || t.failedToPurchase || 'Purchase failed'
             );
         }
-    };
+    }, [user, updateUser, loadInventory, t, translateItem]);
+
+    // Modal handlers
+    const handleItemPress = useCallback((item) => {
+        setSelectedItem(item);
+        setItemDetailVisible(true);
+    }, []);
+
+    const handleCloseItemDetail = useCallback(() => {
+        setItemDetailVisible(false);
+        setSelectedItem(null);
+    }, []);
+
+    const handlePurchaseFromModal = useCallback(() => {
+        if (selectedItem) {
+            handleBuyItem(selectedItem);
+            handleCloseItemDetail();
+        }
+    }, [selectedItem, handleBuyItem, handleCloseItemDetail]);
 
     const getRarityColor = (rarity) => {
         switch (rarity?.toLowerCase()) {
@@ -185,7 +206,7 @@ const ShopScreen = () => {
         );
     };
 
-    const renderItem = ({ item, index }) => {
+    const renderItem = useCallback(({ item, index }) => {
         if (!item) return null;
 
         const name = translateItem(item.name);
@@ -199,93 +220,99 @@ const ShopScreen = () => {
                     marginRight: index % 2 === 0 ? spacing.sm / 2 : 0
                 }
             ]}>
-                <PixelCard
-                    style={[
-                        styles.itemCard,
-                        {
-                            borderColor: theme.border,
-                            backgroundColor: theme.surface
-                        }
-                    ]}
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => handleItemPress(item)}
+                    style={{ flex: 1 }}
                 >
-                    <View style={styles.imageContainer}>
-                        {renderItemImage(item)}
-                    </View>
-
-                    <View style={styles.textContainer}>
-                        <Text
-                            style={[
-                                styles.itemName,
-                                {
-                                    color: getRarityColor(item.rarity),
-                                    fontSize: 14,
-                                    fontWeight: 'bold',
-                                    textAlign: 'center'
-                                }
-                            ]}
-                            numberOfLines={2}
-                        >
-                            {name}
-                        </Text>
-
-                        <Text
-                            style={[
-                                styles.itemType,
-                                {
-                                    color: theme.text,
-                                    opacity: 0.7,
-                                    fontSize: 11,
-                                    textAlign: 'center',
-                                    marginTop: 4
-                                }
-                            ]}
-                            numberOfLines={1}
-                        >
-                            {t[item.type] || item.type} • {t[item.rarity] || item.rarity}
-                        </Text>
-                    </View>
-
-                    <View style={styles.priceContainer}>
-                        <Text style={[
-                            styles.priceText,
-                            {
-                                color: canAfford ? theme.warning : theme.danger,
-                                opacity: canAfford ? 1 : 0.6,
-                                fontSize: 13,
-                                fontWeight: 'bold'
-                            }
-                        ]}>
-                            {item.cost} {t.gold || 'Gold'}
-                        </Text>
-                    </View>
-
-                    <AnimatedPressable
+                    <PixelCard
                         style={[
-                            styles.buyButton,
+                            styles.itemCard,
                             {
-                                backgroundColor: canAfford ? theme.primary : theme.border,
                                 borderColor: theme.border,
-                                opacity: canAfford ? 1 : 0.7
+                                backgroundColor: theme.surface
                             }
                         ]}
-                        onPress={() => canAfford && handleBuyItem(item)}
-                        disabled={!canAfford}
                     >
-                        <Text style={[
-                            styles.buyButtonText,
-                            {
-                                color: theme.textLight,
-                                fontSize: 12,
-                                fontWeight: 'bold'
-                            }
-                        ]}>
-                            {canAfford ? (t.buy || 'Buy') : (t.cannotAfford || 'Too Expensive')}
-                        </Text>
-                    </AnimatedPressable>
-                </PixelCard>
+                        <View style={styles.imageContainer}>
+                            {renderItemImage(item)}
+                        </View>
+
+                        <View style={styles.textContainer}>
+                            <Text
+                                style={[
+                                    styles.itemName,
+                                    {
+                                        color: getRarityColor(item.rarity),
+                                        fontSize: 14,
+                                        fontWeight: 'bold',
+                                        textAlign: 'center'
+                                    }
+                                ]}
+                                numberOfLines={2}
+                            >
+                                {name}
+                            </Text>
+
+                            <Text
+                                style={[
+                                    styles.itemType,
+                                    {
+                                        color: theme.text,
+                                        opacity: 0.7,
+                                        fontSize: 11,
+                                        textAlign: 'center',
+                                        marginTop: 4
+                                    }
+                                ]}
+                                numberOfLines={1}
+                            >
+                                {t[item.type] || item.type} • {t[item.rarity] || item.rarity}
+                            </Text>
+                        </View>
+
+                        <View style={styles.priceContainer}>
+                            <Text style={[
+                                styles.priceText,
+                                {
+                                    color: canAfford ? theme.warning : theme.danger,
+                                    opacity: canAfford ? 1 : 0.6,
+                                    fontSize: 13,
+                                    fontWeight: 'bold'
+                                }
+                            ]}>
+                                {item.cost} {t.gold || 'Gold'}
+                            </Text>
+                        </View>
+
+                        <AnimatedPressable
+                            style={[
+                                styles.buyButton,
+                                {
+                                    backgroundColor: canAfford ? theme.primary : theme.border,
+                                    borderColor: theme.border,
+                                    opacity: canAfford ? 1 : 0.7
+                                }
+                            ]}
+                            onPress={() => canAfford && handleBuyItem(item)}
+                            disabled={!canAfford}
+                        >
+                            <Text style={[
+                                styles.buyButtonText,
+                                {
+                                    color: theme.textLight,
+                                    fontSize: 12,
+                                    fontWeight: 'bold'
+                                }
+                            ]}>
+                                {canAfford ? (t.buy || 'Buy') : (t.cannotAfford || 'Too Expensive')}
+                            </Text>
+                        </AnimatedPressable>
+                    </PixelCard>
+                </TouchableOpacity>
             </View>
         );
-    };
+    }, [user?.gold, theme, t, translateItem, handleItemPress, handleBuyItem]);
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -387,6 +414,15 @@ const ShopScreen = () => {
                     )}
                 />
             )}
+
+            {/* Item Detail Modal */}
+            <ItemDetailModal
+                visible={itemDetailVisible}
+                item={selectedItem}
+                onClose={handleCloseItemDetail}
+                onPurchase={handlePurchaseFromModal}
+                showPurchaseButton={selectedItem && (user?.gold || 0) >= (selectedItem?.cost || 0)}
+            />
         </View>
     );
 };
