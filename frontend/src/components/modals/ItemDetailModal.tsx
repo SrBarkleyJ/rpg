@@ -37,27 +37,16 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
     if (!item) return null;
 
-    // Get item details from the JSON file
+    // Construct item details from translation keys
     const getItemDetails = () => {
-        try {
-            const itemDetails = require('../../config/itemDetails.json');
-            return itemDetails.items[item.name] || {
-                description: item.desc || 'No description available.',
-                effects: [],
-                rarity: item.rarity || 'common',
-                type: item.type || 'unknown',
-                flavor: 'A mysterious item with unknown properties.'
-            };
-        } catch (error) {
-            console.error('Error loading item details:', error);
-            return {
-                description: item.desc || 'No description available.',
-                effects: [],
-                rarity: item.rarity || 'common',
-                type: item.type || 'unknown',
-                flavor: 'A mysterious item with unknown properties.'
-            };
-        }
+        const keyName = item.name.replace(/\s+/g, '');
+        return {
+            description: t[`item_desc_${keyName}`] || item.desc || 'No description available.',
+            effects: t[`item_effect_${keyName}`] ? [t[`item_effect_${keyName}`]] : [],
+            rarity: item.rarity || 'common',
+            type: item.type || 'unknown',
+            flavor: t[`item_flavor_${keyName}`] || 'A mysterious item.'
+        };
     };
 
     const itemDetails = getItemDetails();
@@ -133,7 +122,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                         {/* Description */}
                         <PixelCard style={styles.descriptionCard}>
                             <Text style={[styles.sectionTitle, { color: theme.primary }]}>
-                                📖 Description
+                                📖 {t.descHeader || 'Description'}
                             </Text>
                             <Text style={[styles.description, { color: theme.text }]}>
                                 {itemDetails.description}
@@ -144,7 +133,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                         {itemDetails.effects && itemDetails.effects.length > 0 && (
                             <PixelCard style={styles.effectsCard}>
                                 <Text style={[styles.sectionTitle, { color: theme.primary }]}>
-                                    ✨ Effects
+                                    ✨ {t.effectsHeader || 'Effects'}
                                 </Text>
                                 {itemDetails.effects.map((effect: string, index: number) => (
                                     <Text key={index} style={[styles.effect, { color: theme.text }]}>
@@ -158,7 +147,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                         {itemDetails.flavor && (
                             <PixelCard style={styles.flavorCard}>
                                 <Text style={[styles.sectionTitle, { color: theme.primary }]}>
-                                    📜 Lore
+                                    📜 {t.loreHeader || 'Lore'}
                                 </Text>
                                 <Text style={[styles.flavor, { color: theme.textSecondary, fontStyle: 'italic' }]}>
                                     "{itemDetails.flavor}"
@@ -170,7 +159,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                         {item.allowedClasses && item.allowedClasses.length > 0 && !item.allowedClasses.includes('all') && (
                             <PixelCard style={styles.classesCard}>
                                 <Text style={[styles.sectionTitle, { color: theme.primary }]}>
-                                    👥 Usable by
+                                    👥 {t.usableByHeader || 'Usable by'}
                                 </Text>
                                 <View style={styles.classesContainer}>
                                     {item.allowedClasses.map((className: string, index: number) => (

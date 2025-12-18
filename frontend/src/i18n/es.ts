@@ -84,7 +84,7 @@ export const es = {
     yourHP: 'TUS PV',
     autoCombat: 'COMBATE AUTOMÁTICO',
     manualCombat: 'COMBATE MANUAL',
-    pressToStart: '¡Presiona LUCHAR para iniciar combate automático!',
+    pressToStart: '¡Presiona LUCHAR para iniciar!',
     pressToBegin: '¡Presiona INICIAR COMBATE para comenzar!',
     yourTurn: 'TU TURNO',
     enemyTurnLabel: 'TURNO ENEMIGO',
@@ -185,6 +185,7 @@ export const es = {
     failedToLoadInventory: 'Error al cargar inventario',
     failedToEquip: 'Error al equipar objeto',
     failedToUnequip: 'Error al desequipar objeto',
+    failedToUseItem: 'Error al usar objeto',
     weapon: 'Arma',
     armorSlot: 'Armadura',
     accessory: 'Accesorio',
@@ -273,6 +274,7 @@ export const es = {
     failedToPurchase: 'Error al comprar artículo',
     failedToComplete: 'Error al completar misión',
     failedToAssign: 'Error al asignar punto',
+    notEnoughTetranuta: 'No hay suficiente Tetranuta',
 
     // Shop Categories
     cat_all: 'Todos',
@@ -302,6 +304,172 @@ export const es = {
     item_IronArmor: 'Armadura de Hierro',
     item_MagicRobe: 'Túnica Mágica',
     item_StrengthRing: 'Anillo de Fuerza',
+
+    // Item Details (Descriptions, Effects, Flavors)
+    descHeader: 'Descripción',
+    effectsHeader: 'Efectos',
+    loreHeader: 'Historia',
+    usableByHeader: 'Usable por',
+
+    // Consumables
+    item_desc_MinorHealthPotion: 'Un pequeño vial con líquido rojo que restaura 50 PV. Esencial para aventureros.',
+    item_effect_MinorHealthPotion: 'Restaura 50 PV',
+    item_flavor_MinorHealthPotion: 'La poción de curación básica. Simple, confiable y salvavidas.',
+
+    item_desc_HealthPotion: 'Una poción roja estándar que restaura 100 PV. La elección confiable.',
+    item_effect_HealthPotion: 'Restaura 100 PV',
+    item_flavor_HealthPotion: 'El estándar de oro de las pociones de salud. Ni muy débil, ni muy cara.',
+
+    item_desc_GreaterHealthPotion: 'Un gran vial de líquido rojo potente que restaura 250 PV. Para batallas serias.',
+    item_effect_GreaterHealthPotion: 'Restaura 250 PV',
+    item_flavor_GreaterHealthPotion: 'Cuando necesitas volver a la pelea rápido. Esta poción pega fuerte.',
+
+    item_desc_ManaPotion: 'Un vial azul que restaura 50 Maná. Mantiene la magia fluyendo.',
+    item_effect_ManaPotion: 'Restaura 50 Maná',
+    item_flavor_ManaPotion: 'El equivalente mágico de una poción de salud. Esencial para hechiceros.',
+
+    item_desc_ElixirofPower: 'Un elixir dorado brillante que aumenta todas las estadísticas en +5 por 3 turnos.',
+    item_effect_ElixirofPower: '+5 a todas las estadísticas por 3 turnos',
+    item_flavor_ElixirofPower: 'El mejor potenciador de combate. Cuando necesitas cambiar el rumbo de la batalla.',
+
+    // Weapons
+    item_desc_RustySword: 'Una espada vieja y desgastada, pero aún útil. +2 FUE',
+    item_effect_RustySword: '+2 Fuerza',
+    item_flavor_RustySword: 'Todo gran héroe comenzó con una espada oxidada. Esta ha visto días mejores.',
+
+    item_desc_IronBroadsword: 'Una espada pesada y bien equilibrada. +5 FUE',
+    item_effect_IronBroadsword: '+5 Fuerza',
+    item_flavor_IronBroadsword: 'El caballo de batalla del mundo aventurero. Confiable y robusta.',
+
+    item_desc_SteelClaymore: 'Una hoja masiva que requiere gran fuerza. +10 FUE, -2 Vel',
+    item_effect_SteelClaymore: '+10 Fuerza, -2 Destreza',
+    item_flavor_SteelClaymore: 'Para aquellos que creen que más grande es mejor.',
+
+    item_desc_RuneBlade: 'Una espada grabada con runas mágicas. +5 FUE, +10 INT',
+    item_effect_RuneBlade: '+5 Fuerza, +10 Inteligencia',
+    item_flavor_RuneBlade: 'Una mezcla perfecta de destreza marcial y poder arcano.',
+
+    item_desc_DragonSlayer: 'Una espada legendaria forjada en fuego de dragón. +20 FUE, +5 VIT',
+    item_effect_DragonSlayer: '+20 Fuerza, +5 Vitalidad',
+    item_flavor_DragonSlayer: 'Se dice que fue usada para matar al gran dragón del norte.',
+
+    item_desc_WoodenStaff: 'Un bastón de madera básico. +2 INT',
+    item_effect_WoodenStaff: '+2 Inteligencia',
+    item_flavor_WoodenStaff: 'El primer paso en el camino de la magia. Madera simple, pero canaliza bien.',
+
+    item_desc_ApprenticeWand: 'Un foco mágico estándar para estudiantes. +5 INT',
+    item_effect_ApprenticeWand: '+5 Inteligencia',
+    item_flavor_ApprenticeWand: 'Todo gran mago comenzó como aprendiz.',
+
+    item_desc_CrystalStaff: 'Un bastón con un cristal claro. +12 INT, -3 VIT',
+    item_effect_CrystalStaff: '+12 Inteligencia, -3 Vitalidad',
+    item_flavor_CrystalStaff: 'El cristal enfoca la energía con precisión, pero drena la fuerza vital.',
+
+    item_desc_VoidScepter: 'Un cetro oscuro que extrae poder del vacío. +8 INT, +5 FUE',
+    item_effect_VoidScepter: '+8 Inteligencia, +5 Fuerza',
+    item_flavor_VoidScepter: 'El poder tiene un precio. Este cetro susurra oscuridad.',
+
+    item_desc_DivineStaff: 'Un bastón que canaliza energía divina. +25 INT',
+    item_effect_DivineStaff: '+25 Inteligencia',
+    item_flavor_DivineStaff: 'Bendecido por los mismos dioses. Irradia poder sagrado.',
+
+    item_desc_IronDagger: 'Una hoja pequeña pero mortal. +2 DES',
+    item_effect_IronDagger: '+2 Destreza',
+    item_flavor_IronDagger: 'Pequeña pero letal. Perfecta para golpes rápidos.',
+
+    item_desc_PoisonedKnife: 'Una daga cubierta de veneno mortal. +4 DES, +2 FUE',
+    item_effect_PoisonedKnife: '+4 Destreza, +2 Fuerza',
+    item_flavor_PoisonedKnife: 'La favorita de un asesino. El veneno hace el trabajo.',
+
+    item_desc_TwinBlades: 'Un par de dagas perfectamente equilibradas. +10 DES',
+    item_effect_TwinBlades: '+10 Destreza',
+    item_flavor_TwinBlades: 'Danza de muerte con dos hojas. La velocidad es tu arma.',
+
+    item_desc_ShadowBlade: 'Una hoja que parece absorber la luz. +7 DES, +5 SUERTE',
+    item_effect_ShadowBlade: '+7 Destreza, +5 Suerte',
+    item_flavor_ShadowBlade: 'Difícil de ver, imposible de evitar.',
+
+    item_desc_AssassinsEdge: 'Una hoja legendaria de equilibrio perfecto. +18 DES, +5 SUERTE',
+    item_effect_AssassinsEdge: '+18 Destreza, +5 Suerte',
+    item_flavor_AssassinsEdge: 'El arma de las leyendas. Un golpe, una muerte.',
+
+    // Armor
+    item_desc_LeatherTunic: 'Armadura de cuero ligera. +3 VIT',
+    item_effect_LeatherTunic: '+3 Vitalidad',
+    item_flavor_LeatherTunic: 'Cómoda y flexible. Perfecta para movilidad.',
+
+    item_desc_ChainmailVest: 'Anillos de metal entrelazados. +6 VIT, -1 DES',
+    item_effect_ChainmailVest: '+6 Vitalidad, -1 Destreza',
+    item_flavor_ChainmailVest: 'La armadura clásica del aventurero.',
+
+    item_desc_PlateArmor: 'Placas de metal pesado que ofrecen excelente protección. +12 VIT, -3 DES',
+    item_effect_PlateArmor: '+12 Vitalidad, -3 Destreza',
+    item_flavor_PlateArmor: 'Para aquellos que creen que la mejor defensa es una buena defensa.',
+
+    item_desc_NoviceRobe: 'Túnicas de tela simples. +2 INT',
+    item_effect_NoviceRobe: '+2 Inteligencia',
+    item_flavor_NoviceRobe: 'El atuendo tradicional de los aprendices de magia.',
+
+    item_desc_MasterRobe: 'Túnicas finamente tejidas. +8 INT, +2 VIT',
+    item_effect_MasterRobe: '+8 Inteligencia, +2 Vitalidad',
+    item_flavor_MasterRobe: 'Usadas por maestros de las artes arcanas.',
+
+    // Accessories
+    item_desc_GoldRing: 'Una banda de oro simple pero elegante. +2 SUERTE',
+    item_effect_GoldRing: '+2 Suerte',
+    item_flavor_GoldRing: 'A veces los accesorios más simples traen la mayor fortuna.',
+
+    item_desc_RingofPower: 'Un artefacto legendario. +2 Todas las Estadísticas',
+    item_effect_RingofPower: '+2 a todas las estadísticas',
+    item_flavor_RingofPower: 'Un anillo para gobernarlos a todos.',
+
+    item_desc_RingoftheGiant: 'Un anillo masivo que mejora la fuerza. +5 FUE',
+    item_effect_RingoftheGiant: '+5 Fuerza',
+    item_flavor_RingoftheGiant: 'Se dice que fue usado por gigantes.',
+
+    item_desc_RingofIntellect: 'Un anillo que agudiza la mente. +5 INT',
+    item_effect_RingofIntellect: '+5 Inteligencia',
+    item_flavor_RingofIntellect: 'El conocimiento es poder.',
+
+    item_desc_RingofVitality: 'Un anillo que aumenta la resistencia. +5 VIT',
+    item_effect_RingofVitality: '+5 Vitalidad',
+    item_flavor_RingofVitality: 'La vida fluye más fuerte a través de este anillo.',
+
+    item_desc_RingofAgility: 'Un anillo que mejora la velocidad. +5 DES',
+    item_effect_RingofAgility: '+5 Destreza',
+    item_flavor_RingofAgility: 'El movimiento se vuelve instinto.',
+
+    item_desc_RingofFortune: 'Un anillo que dobla la suerte. +5 SUERTE',
+    item_effect_RingofFortune: '+5 Suerte',
+    item_flavor_RingofFortune: 'La dama fortuna misma debe haber creado este anillo.',
+
+    item_desc_RingofPhysicalMight: 'Un anillo que aumenta el poder físico. +5 FUE, +10% daño físico',
+    item_effect_RingofPhysicalMight: '+5 Fuerza, +10% daño físico',
+    item_flavor_RingofPhysicalMight: 'Poder puro fluye a través de este anillo.',
+
+    item_desc_RingofArcanePower: 'Un anillo que amplifica la salida mágica. +5 INT, +10% daño mágico',
+    item_effect_RingofArcanePower: '+5 Inteligencia, +10% daño mágico',
+    item_flavor_RingofArcanePower: 'Energía arcana crepita alrededor de este anillo.',
+
+    item_desc_RingofManaFlow: 'Un anillo que expande las reservas mágicas. +20 maná máx, +2 regen maná',
+    item_effect_RingofManaFlow: '+20 maná máx, +2 regeneración de maná',
+    item_flavor_RingofManaFlow: 'El maná fluye como un río.',
+
+    item_desc_RingofPrecision: 'Un anillo que agudiza los golpes. +5% prob. crítico, +3 DES',
+    item_effect_RingofPrecision: '+5% probabilidad crítica, +3 Destreza',
+    item_flavor_RingofPrecision: 'La precisión es poder.',
+
+    item_desc_RingoftheWarriorMage: 'Un anillo para quienes caminan entre mundos. +3 FUE, +3 INT',
+    item_effect_RingoftheWarriorMage: '+3 Fuerza, +3 Inteligencia',
+    item_flavor_RingoftheWarriorMage: 'El equilibrio perfecto entre espada y hechizo.',
+
+    item_desc_RingofEternalDefense: 'Magia antigua de protección. +10 Armadura, +3 VIT',
+    item_effect_RingofEternalDefense: '+10 índice de armadura, +3 Vitalidad',
+    item_flavor_RingofEternalDefense: 'Protección eterna contra todas las amenazas.',
+
+    item_desc_RingofMysticKnowledge: 'Protege contra la magia. +10 Resistencia Mágica, +4 INT',
+    item_effect_RingofMysticKnowledge: '+10 resistencia mágica, +4 Inteligencia',
+    item_flavor_RingofMysticKnowledge: 'El conocimiento es la mayor defensa.',
 
     // New Items (Deep RPG)
     item_MinorHealthPotion: 'Poción de Salud Menor',
@@ -366,16 +534,42 @@ export const es = {
     enemy_plague_zombie: 'Zombi Pestilente',
 
     // Missing translations
-    itemUsed: 'Item usado',
-    itemNotFound: 'Item no encontrado',
-    failedToUseItem: 'Error al usar item',
+    itemUsed: 'Objeto usado',
+    itemNotFound: 'Objeto no encontrado',
     viewEquipment: 'Ver Equipo',
 
     // Combat
-    failedToEnterDungeon: 'Error al entrar a mazmorra',
-    failedToContinueDungeon: 'Error al continuar mazmorra',
+    failedToEnterDungeon: 'Error al entrar a la mazmorra',
+    failedToContinueDungeon: 'Error al continuar la mazmorra',
+    failedToStartCombat: 'Error al iniciar combate',
 
     // Ring Selector
     selectRingToReplace: 'Seleccionar Anillo a Reemplazar',
     ringsEquippedMessage: 'Tienes 4 anillos equipados. Elige cuál reemplazar:',
+    // Errors & Alerts
+    victoryMessage: '¡Has derrotado al enemigo!',
+    defeatMessage: 'Fuiste derrotado en batalla...',
+    goldLost: 'Oro Perdido',
+    dungeonCompleted: '¡MAZMORRA COMPLETADA!',
+    continue: 'CONTINUAR',
+
+    // Inventory & Equipment (New)
+    untitledTask: 'Tarea Sin Título',
+    maxLevel: 'Nivel Máximo',
+
+    // Stats Abbreviations
+    STR: 'FUE',
+    INT: 'INT',
+    VIT: 'VIT',
+    DEX: 'DES',
+    LCK: 'SUE',
+
+    // Classes
+    class_warrior: 'Guerrero',
+    class_mage: 'Mago',
+    class_rogue: 'Pícaro',
+
+    // Forge (New)
+    // Keys like forgeButton, forgeTitle already exist.
+    nowLevel: 'Ahora nivel',
 };

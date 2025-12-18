@@ -46,18 +46,18 @@ const CombatResultModal: React.FC<CombatResultModalProps> = ({ visible, type, da
                                     <Text style={[styles.sectionTitle, theme.typography.h3, { color: theme.text }]}>{t.rewards || 'REWARDS'}</Text>
 
                                     <View style={[styles.rewardRow, { borderBottomColor: theme.border }]}>
-                                        <Text style={[styles.rewardLabel, theme.typography.body, { color: theme.text }]}>Gold</Text>
+                                        <Text style={[styles.rewardLabel, theme.typography.body, { color: theme.text }]}>{t.gold || 'Gold'}</Text>
                                         <Text style={[styles.rewardValue, theme.typography.bodyBold, { color: theme.warning }]}>+{data.rewards?.goldGained || 0}</Text>
                                     </View>
 
                                     <View style={[styles.rewardRow, { borderBottomColor: theme.border }]}>
-                                        <Text style={[styles.rewardLabel, theme.typography.body, { color: theme.text }]}>XP</Text>
+                                        <Text style={[styles.rewardLabel, theme.typography.body, { color: theme.text }]}>{t.xp || 'XP'}</Text>
                                         <Text style={[styles.rewardValue, theme.typography.bodyBold, { color: theme.success }]}>+{data.rewards?.xpGained || 0}</Text>
                                     </View>
 
                                     {data.rewards?.tetranutaDropped && (
                                         <View style={[styles.rewardRow, { borderBottomColor: theme.border }]}>
-                                            <Text style={[styles.rewardLabel, theme.typography.body, { color: theme.text }]}>Tetranuta</Text>
+                                            <Text style={[styles.rewardLabel, theme.typography.body, { color: theme.text }]}>{t.tetranuta || 'Tetranuta'}</Text>
                                             <Text style={[styles.rewardValue, theme.typography.bodyBold, { color: theme.primary }]}>+1</Text>
                                         </View>
                                     )}

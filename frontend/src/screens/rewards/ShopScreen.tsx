@@ -11,6 +11,7 @@ import {
     Dimensions,
     ActivityIndicator
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import rewardApi from '../../api/rewardApi';
 import { useAuth } from '../../hooks/useAuth';
 import { useInventory } from '../../hooks/useInventory';
@@ -308,6 +309,15 @@ const ShopScreen = () => {
                                 {canAfford ? (t.buy || 'Buy') : (t.cannotAfford || 'Too Expensive')}
                             </Text>
                         </AnimatedPressable>
+
+                        <TouchableOpacity
+                            style={[styles.infoButton, { marginTop: spacing.sm }]}
+                            onPress={() => handleItemPress(item)}
+                        >
+                            <Text style={{ color: theme.textSecondary, fontSize: 12, textDecorationLine: 'underline' }}>
+                                {t.viewDetails || 'View Details'}
+                            </Text>
+                        </TouchableOpacity>
                     </PixelCard>
                 </TouchableOpacity>
             </View>
@@ -499,7 +509,14 @@ const styles = StyleSheet.create({
         marginBottom: spacing.sm,
         backgroundColor: '#FFFFFF',
         borderRadius: 6,
+
         overflow: 'hidden',
+        position: 'relative',
+    },
+    infoButton: {
+        padding: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     itemImage: {
         width: '90%',

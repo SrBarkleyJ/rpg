@@ -50,9 +50,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     {/* Botón de iniciar combate */}
                     <AnimatedPressable
                         style={[
-                            styles.actionButton, 
-                            { 
-                                backgroundColor: theme.danger, 
+                            styles.actionButton,
+                            {
+                                backgroundColor: theme.danger,
                                 borderColor: theme.border,
                                 height: mainButtonHeight,
                                 marginBottom: buttonGap,
@@ -60,10 +60,12 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         ]}
                         onPress={onInitiateCombat}
                         disabled={loading}
+                        accessibilityLabel={activeCombat?.dungeonInfo ? t.nextEnemy : t.startCombatButton}
+                        accessibilityRole="button"
                     >
                         <Text style={[
                             styles.actionText,
-                            { 
+                            {
                                 color: theme.textLight,
                                 fontSize: mainButtonFontSize
                             }
@@ -71,22 +73,24 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                             {activeCombat?.dungeonInfo ? `➡️ ${t.nextEnemy}` : `⚔️ ${t.startCombatButton}`}
                         </Text>
                     </AnimatedPressable>
-                    
+
                     {/* Botón de volver al menú */}
                     <TouchableOpacity
                         style={[
                             styles.smallButton,
-                            { 
-                                backgroundColor: theme.secondary, 
+                            {
+                                backgroundColor: theme.secondary,
                                 borderColor: theme.border,
                                 height: secondaryButtonHeight,
                             }
                         ]}
                         onPress={onBackToMenu}
+                        accessibilityLabel={t.menuArrow}
+                        accessibilityRole="button"
                     >
                         <Text style={[
                             styles.smallButtonText,
-                            { 
+                            {
                                 color: theme.textLight,
                                 fontSize: secondaryButtonFontSize
                             }
@@ -101,19 +105,21 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     <AnimatedPressable
                         style={[
                             styles.actionButton,
-                            { 
-                                backgroundColor: theme.danger, 
-                                borderColor: theme.border, 
+                            {
+                                backgroundColor: theme.danger,
+                                borderColor: theme.border,
                                 opacity: playerTurn && !loading ? 1 : 0.5,
                                 height: mainButtonHeight,
                             }
                         ]}
                         onPress={onAttack}
                         disabled={!playerTurn || loading}
+                        accessibilityLabel={t.attack}
+                        accessibilityRole="button"
                     >
                         <Text style={[
                             styles.actionText,
-                            { 
+                            {
                                 color: theme.textLight,
                                 fontSize: mainButtonFontSize
                             }
@@ -135,10 +141,12 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         ]}
                         onPress={onOpenSkills}
                         disabled={!playerTurn || loading}
+                        accessibilityLabel={t.skillsIcon}
+                        accessibilityRole="button"
                     >
                         <Text style={[
                             styles.actionText,
-                            { 
+                            {
                                 color: theme.textLight,
                                 fontSize: mainButtonFontSize
                             }
@@ -153,9 +161,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <TouchableOpacity
                             style={[
                                 styles.smallButton,
-                                { 
-                                    backgroundColor: theme.primary, 
-                                    borderColor: theme.border, 
+                                {
+                                    backgroundColor: theme.primary,
+                                    borderColor: theme.border,
                                     opacity: playerTurn && !loading ? 1 : 0.5,
                                     height: secondaryButtonHeight,
                                     flex: 1.2,
@@ -163,10 +171,12 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                             ]}
                             onPress={onDefend}
                             disabled={!playerTurn || loading}
+                            accessibilityLabel={t.defend}
+                            accessibilityRole="button"
                         >
                             <Text style={[
                                 styles.smallButtonText,
-                                { 
+                                {
                                     color: theme.textLight,
                                     fontSize: secondaryButtonFontSize
                                 }
@@ -179,9 +189,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <TouchableOpacity
                             style={[
                                 styles.smallButton,
-                                { 
-                                    backgroundColor: '#fbbf24', 
-                                    borderColor: theme.border, 
+                                {
+                                    backgroundColor: '#fbbf24',
+                                    borderColor: theme.border,
                                     opacity: playerTurn && !loading ? 1 : 0.5,
                                     height: secondaryButtonHeight,
                                     flex: 1,
@@ -189,10 +199,12 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                             ]}
                             onPress={onOpenInventory}
                             disabled={!playerTurn || loading}
+                            accessibilityLabel={t.useItem}
+                            accessibilityRole="button"
                         >
                             <Text style={[
                                 styles.smallButtonText,
-                                { 
+                                {
                                     color: '#000',
                                     fontSize: secondaryButtonFontSize,
                                     fontWeight: 'bold'

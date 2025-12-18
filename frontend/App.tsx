@@ -13,13 +13,27 @@ import { Asset } from 'expo-asset';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform, Dimensions } from 'react-native';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
+const { width: windowWidth } = Dimensions.get('window');
+
 const AppContent = () => {
     const { user } = useAuth();
+
+    // For Web, we force a mobile-like container
+    if (Platform.OS === 'web' && windowWidth > 600) {
+        return (
+            <View style={styles.webWrapper}>
+                <View style={styles.webContainer}>
+                    <AppNavigator />
+                </View>
+            </View>
+        );
+    }
+
     return <AppNavigator />;
 };
 
@@ -91,6 +105,27 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+    webWrapper: {
+        flex: 1,
+        backgroundColor: '#0a0a0a', // Fondo oscuro para el escritorio
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    webContainer: {
+        width: 450, // Ancho de móvil estándar
+        height: '95%',
+        maxHeight: 900,
+        backgroundColor: '#000',
+        borderRadius: 20,
+        overflow: 'hidden',
+        borderWidth: 4,
+        borderColor: '#333',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.58,
+        shadowRadius: 16.00,
+        elevation: 24,
+    },
     container: {
         flex: 1,
         backgroundColor: '#fff',

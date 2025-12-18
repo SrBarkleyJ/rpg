@@ -6,17 +6,17 @@ import { spacing } from '../../theme/spacing';
 interface CombatLogProps {
     logs: any[];
     theme: any;
-    scrollViewRef: RefObject<ScrollView>;
+    scrollViewRef: RefObject<ScrollView | null>;
     t: any;
 }
 
 const CombatLog: React.FC<CombatLogProps> = ({ logs, theme, scrollViewRef, t }) => {
     const renderLogItem = (log: any, index: number) => (
         <Text key={index} style={[styles.logText, { color: theme.text }]}>
-            <Text style={{ 
-                fontWeight: 'bold', 
-                color: log.actor === 'Player' ? theme.success : 
-                       log.actor === 'System' ? theme.warning : theme.danger 
+            <Text style={{
+                fontWeight: 'bold',
+                color: log.actor === 'Player' ? theme.success :
+                    log.actor === 'System' ? theme.warning : theme.danger
             }}>
                 {log.actor}:
             </Text>

@@ -2,15 +2,37 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../config/api';
 import { log } from '../utils/logger';
+import { handleMockRequest } from '../mocks/mockInterceptor';
+
+const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCKS === 'true';
 
 log(`[API Client] Base URL: ${API_URL}`);
+if (USE_MOCKS) {
+    log('🚀 [API Client] MOCK MODE ACTIVE');
+}
 
 const apiClient = axios.create({
     baseURL: API_URL,
-    timeout: 15000, // 15 second timeout (increased from 5s for slower networks)
+    timeout: 15000,
     headers: {
         'Content-Type': 'application/json',
     },
+    // Custom adapter for mock mode
+    adapter: (config) => {
+        if (process.env.EXPO_PUBLIC_USE_MOCKS === 'true') {
+            return handleMockRequest(config).then(response => ({
+                ...response,
+                config,
+                statusText: 'OK'
+            } as any));
+        }
+        // Use default adapter for real requests
+        const defaultAdapter = axios.defaults.adapter;
+        if (typeof defaultAdapter === 'function') {
+            return defaultAdapter(config);
+        }
+        throw new Error('Default adapter not found');
+    }
 });
 
 // Retry logic for network failures
@@ -42,14 +64,14 @@ apiClient.interceptors.response.use(
     },
     async (error: AxiosError) => {
         const config = error.config as any;
-        
+
         // Handle token expiration (401 Unauthorized)
         if (error.response?.status === 401) {
             console.error('[API] Token expired or invalid (401)');
             // Clear stored auth data
             await AsyncStorage.removeItem('token');
             await AsyncStorage.removeItem('user');
-            
+
             // Optionally navigate to login - this would need to be passed via context
             // For now, just reject the promise and let the component handle it
         }
@@ -58,10 +80,10 @@ apiClient.interceptors.response.use(
         if (error.code && !error.response && retryCount < MAX_RETRIES) {
             retryCount++;
             console.warn(`[API] Retrying request (attempt ${retryCount}/${MAX_RETRIES})...`);
-            
+
             // Wait before retrying (exponential backoff: 1s, 2s)
             await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-            
+
             return apiClient.request(config);
         }
 
