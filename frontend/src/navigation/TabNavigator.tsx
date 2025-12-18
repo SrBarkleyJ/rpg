@@ -33,10 +33,6 @@ const Tab = createBottomTabNavigator();
 // Grid Modal Component containing ALL navigation + Settings
 const GridModal = ({ visible, onClose, theme, t, logout, language, toggleLanguage }) => {
     const navigation = useNavigation<any>();
-    const { width: windowWidth } = useWindowDimensions();
-
-    const isLargeWeb = Platform.OS === 'web' && windowWidth > 600;
-    const contentWidth = isLargeWeb ? 450 : windowWidth;
 
     const options = [
         { name: 'Home', label: t.homeTitle || 'Home', icon: 'home', screen: 'Home' },
@@ -62,11 +58,10 @@ const GridModal = ({ visible, onClose, theme, t, logout, language, toggleLanguag
             transparent={true}
             onRequestClose={onClose}
         >
-            <View style={[styles.modalOverlay, isLargeWeb && styles.webModalOverlay]}>
+            <View style={styles.modalOverlay}>
                 <View style={[
                     styles.modalContent,
-                    { backgroundColor: theme.background, width: contentWidth },
-                    isLargeWeb && styles.webModalContent
+                    { backgroundColor: theme.background }
                 ]}>
 
                     {/* Header */}
@@ -80,7 +75,7 @@ const GridModal = ({ visible, onClose, theme, t, logout, language, toggleLanguag
                     {/* Navigation Grid */}
                     <FlatGrid
                         data={options}
-                        itemDimension={(contentWidth - 60) / 3}
+                        itemDimension={100}
                         spacing={10}
                         renderItem={({ item }) => (
                             <TouchableOpacity
@@ -134,9 +129,6 @@ const MainTabs = () => {
     const { t, language, toggleLanguage } = useLanguage();
     const { user, logout } = useAuth();
     const [menuVisible, setMenuVisible] = useState(false);
-    const { width: windowWidth } = useWindowDimensions();
-
-    const isLargeWeb = Platform.OS === 'web' && windowWidth > 600;
 
     // Dummy component for the Menu Tab
     const MenuComponent = () => null;
@@ -233,10 +225,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'flex-end',
     },
-    webModalOverlay: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     modalContent: {
         height: '75%',
         borderTopLeftRadius: 20,
@@ -244,11 +232,6 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingHorizontal: 15,
         elevation: 10,
-    },
-    webModalContent: {
-        height: '80%',
-        borderRadius: 20,
-        maxWidth: 450,
     },
     modalHeader: {
         flexDirection: 'row',

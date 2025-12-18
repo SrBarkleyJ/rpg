@@ -2,14 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../config/api';
 import { log } from '../utils/logger';
-import { handleMockRequest } from '../mocks/mockInterceptor';
-
-const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCKS === 'true';
-
 log(`[API Client] Base URL: ${API_URL}`);
-if (USE_MOCKS) {
-    log('🚀 [API Client] MOCK MODE ACTIVE');
-}
 
 const apiClient = axios.create({
     baseURL: API_URL,
@@ -17,22 +10,6 @@ const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    // Custom adapter for mock mode
-    adapter: (config) => {
-        if (process.env.EXPO_PUBLIC_USE_MOCKS === 'true') {
-            return handleMockRequest(config).then(response => ({
-                ...response,
-                config,
-                statusText: 'OK'
-            } as any));
-        }
-        // Use default adapter for real requests
-        const defaultAdapter = axios.defaults.adapter;
-        if (typeof defaultAdapter === 'function') {
-            return defaultAdapter(config);
-        }
-        throw new Error('Default adapter not found');
-    }
 });
 
 // Retry logic for network failures

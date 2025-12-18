@@ -18,24 +18,6 @@ import { View, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
-const AppContent = () => {
-    const { user } = useAuth();
-    const { width: windowWidth } = useWindowDimensions();
-
-    // For Web, we force a mobile-like container
-    if (Platform.OS === 'web' && windowWidth > 600) {
-        return (
-            <View style={styles.webWrapper}>
-                <View style={[styles.webContainer, { width: Math.min(windowWidth * 0.9, 450) }]}>
-                    <AppNavigator />
-                </View>
-            </View>
-        );
-    }
-
-    return <AppNavigator />;
-};
-
 export default function App() {
     const [appIsReady, setAppIsReady] = useState(false);
 
@@ -94,7 +76,7 @@ export default function App() {
                 <ThemeProvider>
                     <AuthProvider>
                         <InventoryProvider>
-                            <AppContent />
+                            <AppNavigator />
                         </InventoryProvider>
                     </AuthProvider>
                 </ThemeProvider>
@@ -104,26 +86,6 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-    webWrapper: {
-        flex: 1,
-        backgroundColor: '#121212', // Slightly lighter dark for contrast
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    webContainer: {
-        height: '95%',
-        maxHeight: 900,
-        backgroundColor: '#000',
-        borderRadius: 30, // More rounded for modern look
-        overflow: 'hidden',
-        borderWidth: 8, // Thicker border like a real phone frame
-        borderColor: '#222',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 20 },
-        shadowOpacity: 0.8,
-        shadowRadius: 30,
-        elevation: 24,
-    },
     container: {
         flex: 1,
         backgroundColor: '#fff',
