@@ -1,5 +1,5 @@
 import { MOCK_USER } from './userData';
-import { MOCK_COMBAT, MOCK_DUNGEONS, MOCK_INVENTORY } from './combatData';
+import { MOCK_COMBAT, MOCK_DUNGEONS, MOCK_INVENTORY, MOCK_REWARDS, MOCK_TASKS, MOCK_FORGE, MOCK_SKILLS } from './combatData';
 
 export interface MockResponse {
     data: any;
@@ -30,16 +30,92 @@ export const handleMockRequest = async (config: any): Promise<MockResponse> => {
         };
     }
 
-    // Generic Stats (sometimes requested separately)
+    // Stats Screen
     if (url.includes('/stats')) {
         return {
-            data: MOCK_USER.stats,
+            data: {
+                ...MOCK_USER,
+                calculatedPhysicalDamage: MOCK_USER.stats.strength * 2,
+                calculatedMagicalDamage: MOCK_USER.stats.intelligence * 2.5,
+                calculatedMaxHP: MOCK_USER.combat.maxHP,
+                calculatedCritChance: MOCK_USER.stats.luck * 0.5
+            },
             status: 200,
             headers: {}
         };
     }
 
-    // Inventory - IMPORTANT: Frontend expects response.data.data.inventory
+    // Shop Rewards
+    if (url.includes('/rewards')) {
+        if (url.includes('/buy')) {
+            return {
+                data: { success: true, user: MOCK_USER },
+                status: 200,
+                headers: {}
+            };
+        }
+        return {
+            data: MOCK_REWARDS,
+            status: 200,
+            headers: {}
+        };
+    }
+
+    // Tasks
+    if (url.includes('/tasks')) {
+        if (url.includes('/complete')) {
+            return {
+                data: {
+                    success: true,
+                    user: MOCK_USER,
+                    goldGained: 50,
+                    xpGained: 100,
+                    leveledUp: false
+                },
+                status: 200,
+                headers: {}
+            };
+        }
+        return {
+            data: MOCK_TASKS,
+            status: 200,
+            headers: {}
+        };
+    }
+
+    // Forge
+    if (url.includes('/forge')) {
+        if (url.includes('/upgrade')) {
+            return {
+                data: { success: true, user: { ...MOCK_USER, tetranuta: MOCK_FORGE.tetranuta - 10 } },
+                status: 200,
+                headers: {}
+            };
+        }
+        return {
+            data: MOCK_FORGE,
+            status: 200,
+            headers: {}
+        };
+    }
+
+    // Skills
+    if (url.includes('/skills')) {
+        if (url.includes('/upgrade')) {
+            return {
+                data: { success: true, user: MOCK_USER },
+                status: 200,
+                headers: {}
+            };
+        }
+        return {
+            data: MOCK_SKILLS,
+            status: 200,
+            headers: {}
+        };
+    }
+
+    // Inventory
     if (url.includes('/inventory')) {
         return {
             data: {
@@ -63,7 +139,7 @@ export const handleMockRequest = async (config: any): Promise<MockResponse> => {
     // Combat Dungeons
     if (url.includes('/combat/dungeons')) {
         return {
-            data: MOCK_DUNGEONS,
+            data: { dungeons: MOCK_DUNGEONS.dungeons },
             status: 200,
             headers: {}
         };
@@ -78,21 +154,9 @@ export const handleMockRequest = async (config: any): Promise<MockResponse> => {
         };
     }
 
-    // Combat Actions
-    if (url.includes('/combat/action')) {
-        return {
-            data: {
-                ...MOCK_COMBAT,
-                log: [...MOCK_COMBAT.log, { actor: 'Player', message: 'You attack the enemy!' }]
-            },
-            status: 200,
-            headers: {}
-        };
-    }
-
     // Default fallback
     return {
-        data: { message: "Mock endpoint not implemented" },
+        data: { message: "Mock endpoint not implemented", url },
         status: 404,
         headers: {}
     };
