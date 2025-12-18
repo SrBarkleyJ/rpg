@@ -56,21 +56,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const loadUser = async () => {
             try {
+                const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCKS === 'true';
+
                 // Safety timeout to prevent hang
                 const timeoutPromise = new Promise<void>((_, reject) =>
                     setTimeout(() => reject(new Error('Auth load timeout')), 5000)
                 );
 
                 const loadPromise = async () => {
-                    // In development, restore stored user for better hot reloading experience
                     const token = await AsyncStorage.getItem('token');
                     const userData = await AsyncStorage.getItem('user');
+
                     if (token && userData) {
                         console.log('[Auth] 🔄 Hot reload: Restoring user session');
                         setUser(JSON.parse(userData));
+                    } else if (USE_MOCKS) {
+                        console.log('[Auth] 🚀 Mock Mode: Auto-logging in demo user');
+                        const { MOCK_USER } = require('../mocks/userData');
+                        await AsyncStorage.setItem('token', 'mock_token');
+                        await AsyncStorage.setItem('user', JSON.stringify(MOCK_USER));
+                        setUser(MOCK_USER);
                     } else {
                         console.log('[Auth] 🆕 Fresh start: No stored session');
-                        // For security, force fresh login on app startup
                         setUser(null);
                     }
                 };

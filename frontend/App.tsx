@@ -13,21 +13,20 @@ import { Asset } from 'expo-asset';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Platform, Dimensions } from 'react-native';
+import { View, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
-const { width: windowWidth } = Dimensions.get('window');
-
 const AppContent = () => {
     const { user } = useAuth();
+    const { width: windowWidth } = useWindowDimensions();
 
     // For Web, we force a mobile-like container
     if (Platform.OS === 'web' && windowWidth > 600) {
         return (
             <View style={styles.webWrapper}>
-                <View style={styles.webContainer}>
+                <View style={[styles.webContainer, { width: Math.min(windowWidth * 0.9, 450) }]}>
                     <AppNavigator />
                 </View>
             </View>
@@ -107,23 +106,22 @@ export default function App() {
 const styles = StyleSheet.create({
     webWrapper: {
         flex: 1,
-        backgroundColor: '#0a0a0a', // Fondo oscuro para el escritorio
+        backgroundColor: '#121212', // Slightly lighter dark for contrast
         alignItems: 'center',
         justifyContent: 'center',
     },
     webContainer: {
-        width: 450, // Ancho de móvil estándar
         height: '95%',
         maxHeight: 900,
         backgroundColor: '#000',
-        borderRadius: 20,
+        borderRadius: 30, // More rounded for modern look
         overflow: 'hidden',
-        borderWidth: 4,
-        borderColor: '#333',
+        borderWidth: 8, // Thicker border like a real phone frame
+        borderColor: '#222',
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.58,
-        shadowRadius: 16.00,
+        shadowOffset: { width: 0, height: 20 },
+        shadowOpacity: 0.8,
+        shadowRadius: 30,
         elevation: 24,
     },
     container: {

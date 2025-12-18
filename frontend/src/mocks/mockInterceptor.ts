@@ -1,5 +1,5 @@
 import { MOCK_USER } from './userData';
-import { MOCK_COMBAT, MOCK_DUNGEONS } from './combatData';
+import { MOCK_COMBAT, MOCK_DUNGEONS, MOCK_INVENTORY } from './combatData';
 
 export interface MockResponse {
     data: any;
@@ -21,8 +21,8 @@ export const handleMockRequest = async (config: any): Promise<MockResponse> => {
         };
     }
 
-    // User / Stats
-    if (url.includes('/user/profile') || url.includes('/stats')) {
+    // User Profile
+    if (url.includes('/user/profile')) {
         return {
             data: MOCK_USER,
             status: 200,
@@ -30,7 +30,37 @@ export const handleMockRequest = async (config: any): Promise<MockResponse> => {
         };
     }
 
-    // Combat
+    // Generic Stats (sometimes requested separately)
+    if (url.includes('/stats')) {
+        return {
+            data: MOCK_USER.stats,
+            status: 200,
+            headers: {}
+        };
+    }
+
+    // Inventory - IMPORTANT: Frontend expects response.data.data.inventory
+    if (url.includes('/inventory')) {
+        return {
+            data: {
+                success: true,
+                data: {
+                    inventory: MOCK_INVENTORY,
+                    equipped: MOCK_INVENTORY.filter(i => i.equipped),
+                    equipmentBonuses: {},
+                    user: {
+                        gold: MOCK_USER.gold,
+                        stats: MOCK_USER.stats,
+                        combat: MOCK_USER.combat
+                    }
+                }
+            },
+            status: 200,
+            headers: {}
+        };
+    }
+
+    // Combat Dungeons
     if (url.includes('/combat/dungeons')) {
         return {
             data: MOCK_DUNGEONS,
@@ -39,6 +69,7 @@ export const handleMockRequest = async (config: any): Promise<MockResponse> => {
         };
     }
 
+    // Combat Initiation
     if (url.includes('/combat/initiate') || url.includes('/combat/auto')) {
         return {
             data: MOCK_COMBAT,
@@ -47,6 +78,7 @@ export const handleMockRequest = async (config: any): Promise<MockResponse> => {
         };
     }
 
+    // Combat Actions
     if (url.includes('/combat/action')) {
         return {
             data: {

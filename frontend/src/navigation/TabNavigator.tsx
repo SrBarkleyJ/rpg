@@ -6,13 +6,13 @@ import {
     StyleSheet,
     TouchableOpacity,
     Modal,
-    Dimensions
+    useWindowDimensions,
+    Platform
 } from 'react-native';
 import { FlatGrid } from 'react-native-super-grid';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-// Static Import ONLY for Home (Initial Screen) to ensure fast load
 import HomeScreen from '../screens/dashboard/HomeScreen';
 import CombatScreen from '../screens/combat/CombatScreen';
 import TaskListScreen from '../screens/tasks/TaskListScreen';
@@ -28,15 +28,18 @@ import { useLanguage } from '../context/LanguageContext';
 import ThemeSelector from '../components/UI/ThemeSelector';
 import { hapticSelection } from '../utils/haptics';
 
-const { width } = Dimensions.get('window');
 const Tab = createBottomTabNavigator();
 
 // Grid Modal Component containing ALL navigation + Settings
 const GridModal = ({ visible, onClose, theme, t, logout, language, toggleLanguage }) => {
     const navigation = useNavigation<any>();
+    const { width: windowWidth } = useWindowDimensions();
+
+    const isLargeWeb = Platform.OS === 'web' && windowWidth > 600;
+    const contentWidth = isLargeWeb ? 450 : windowWidth;
 
     const options = [
-        { name: 'Home', label: t.homeTitle || 'Home', icon: 'home', screen: 'Home' }, // Navigate to UserHome to keep history clear or Main
+        { name: 'Home', label: t.homeTitle || 'Home', icon: 'home', screen: 'Home' },
         { name: 'Tasks', label: t.navTasks || 'Tasks', icon: 'list', screen: 'Tasks' },
         { name: 'Combat', label: t.navCombat || 'Combat', icon: 'skull', screen: 'Combat' },
         { name: 'Inventory', label: t.navInventory || 'Inventory', icon: 'briefcase', screen: 'Inventory' },
@@ -59,8 +62,12 @@ const GridModal = ({ visible, onClose, theme, t, logout, language, toggleLanguag
             transparent={true}
             onRequestClose={onClose}
         >
-            <View style={styles.modalOverlay}>
-                <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
+            <View style={[styles.modalOverlay, isLargeWeb && styles.webModalOverlay]}>
+                <View style={[
+                    styles.modalContent,
+                    { backgroundColor: theme.background, width: contentWidth },
+                    isLargeWeb && styles.webModalContent
+                ]}>
 
                     {/* Header */}
                     <View style={styles.modalHeader}>
@@ -73,7 +80,7 @@ const GridModal = ({ visible, onClose, theme, t, logout, language, toggleLanguag
                     {/* Navigation Grid */}
                     <FlatGrid
                         data={options}
-                        itemDimension={(width - 60) / 3}
+                        itemDimension={(contentWidth - 60) / 3}
                         spacing={10}
                         renderItem={({ item }) => (
                             <TouchableOpacity
@@ -127,6 +134,9 @@ const MainTabs = () => {
     const { t, language, toggleLanguage } = useLanguage();
     const { user, logout } = useAuth();
     const [menuVisible, setMenuVisible] = useState(false);
+    const { width: windowWidth } = useWindowDimensions();
+
+    const isLargeWeb = Platform.OS === 'web' && windowWidth > 600;
 
     // Dummy component for the Menu Tab
     const MenuComponent = () => null;
@@ -174,11 +184,6 @@ const MainTabs = () => {
                     options={{ title: 'Menu' }}
                 />
 
-                {/* 
-                    ALL screens are now strictly inside the TabNavigator 
-                    so the Bottom Bar (with the Menu Button) remains visible.
-                    Using getComponent for Lazy Loading to safely handle potential init errors.
-                */}
                 <Tab.Screen name="Combat" component={CombatScreen} />
                 <Tab.Screen name="Tasks" component={TaskListScreen} />
                 <Tab.Screen name="Shop" component={ShopScreen} />
@@ -228,6 +233,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'flex-end',
     },
+    webModalOverlay: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     modalContent: {
         height: '75%',
         borderTopLeftRadius: 20,
@@ -235,6 +244,11 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingHorizontal: 15,
         elevation: 10,
+    },
+    webModalContent: {
+        height: '80%',
+        borderRadius: 20,
+        maxWidth: 450,
     },
     modalHeader: {
         flexDirection: 'row',
